@@ -438,3 +438,127 @@ input:focus, textarea:focus, select:focus {
   .hesap { grid-template-columns: 1fr; gap: 24px; }
   .sidenav { flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
 }
+
+
+/* Full-width correspondence ledger under the calendar */
+.ledger { margin-top: 36px; padding-top: 8px; }
+.ledger h2 { font-style: italic; font-size: 28px; font-weight: 500; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line-strong); }
+.ledger .add { margin-top: 16px; }
+.ledger-table { width: 100%; min-width: 0; }
+.ledger-head, .ledger-row {
+  display: grid;
+  grid-template-columns: 8.6rem minmax(0, 1fr) 5.5rem 5.2rem;
+  gap: 16px 20px;
+  width: 100%;
+  align-items: start;
+  text-align: left;
+}
+.ledger-head {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+.ledger-row {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  font: inherit;
+  padding: 12px 0;
+  cursor: pointer;
+}
+.ledger-row:hover .ttl { border-bottom: 1px solid var(--ink); }
+.ledger-row.is-today { color: var(--wax); }
+.ledger-row .dt {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  padding-top: 4px;
+}
+.ledger-row.is-today .dt { color: var(--wax); }
+.ilk { min-width: 0; }
+.ilk-title { display: flex; align-items: baseline; gap: 0.45em; min-width: 0; }
+.ilk-title .emoji { flex: 0 0 auto; line-height: 1.2; font-size: 1.05em; }
+.ilk-title .ttl { min-width: 0; flex: 1 1 auto; overflow-wrap: break-word; word-break: normal; white-space: normal; font-size: 18px; line-height: 1.35; }
+.ledger-note { display: block; margin-top: 6px; }
+.ledger-note-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.ledger-note-text.is-open {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+.ledger-note-more {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0;
+  cursor: pointer;
+}
+.ledger-rec {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-top: 5px;
+  white-space: nowrap;
+}
+.ledger-age, .ledger-row .meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+  padding-top: 4px;
+}
+.ledger-head .ledger-age { text-align: right; }
+
+.note-area {
+  display: block;
+  min-height: 7.5em;
+  resize: vertical;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--line-strong);
+  padding: 8px 0;
+}
+.note-count { display: block; text-align: right; margin-top: 4px; }
+
+@media (max-width: 600px) {
+  .ledger-head { display: none; }
+  .ledger-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 12px;
+  }
+  .ledger-row .dt { grid-column: 1; grid-row: 1; }
+  .ledger-row .meta, .ledger-row .ledger-age { grid-column: 2; grid-row: 1; }
+  .ledger-row .ilk { grid-column: 1 / -1; grid-row: 2; }
+  .ledger-rec { grid-column: 1 / -1; grid-row: 3; padding-top: 0; }
+  /* if no recurrence, note still sits under title inside .ilk (line 3) */
+  .ledger h2 { font-size: 24px; }
+}

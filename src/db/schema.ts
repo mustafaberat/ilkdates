@@ -56,7 +56,7 @@ export const events = pgTable(
     emoji: varchar("emoji", { length: 16 }),
     category: varchar("category", { length: 40 }),
     recurrence: recurrenceEnum("recurrence").notNull().default("none"),
-    note: varchar("note", { length: 500 }),
+    note: varchar("note", { length: 1000 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

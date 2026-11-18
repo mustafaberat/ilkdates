@@ -1,8 +1,8 @@
 export const tr = {
   brand: "ilkdates",
-  tagline: "İlklerinize adres yazın.",
-  metaTitle: "ilkdates — İlklerinize adres yazın",
-  metaDescription: "Tarih, tekrar, bir not. Fotoğraf yok.",
+  tagline: "İlk tarihlerinizi kaydedin.",
+  metaTitle: "ilkdates — İlk tarihlerinizi kaydedin",
+  metaDescription: "İlk tarihleri kaydeden web uygulaması.",
   metaShareDescription: "{date} — bir ilk, bir yıldönümü.",
 
   guestBanner:
@@ -52,8 +52,8 @@ export const tr = {
   emoji: "Emoji",
   category: "Kategori",
   categoryPlaceholder: "Örn. ilişki, aile — veya yukarıdan seç",
-  note: "Not",
-  notePlaceholder: "İsteğe bağlı bir not",
+  note: "Açıklama / Not",
+  notePlaceholder: "İsteğe bağlı bir açıklama",
   recurrence: "Tekrar",
   recurrenceNone: "Yok",
   recurrenceMonthly: "Aylık",
@@ -149,6 +149,12 @@ export const tr = {
   guestAccountPrompt: "Şifre ve hesap işlemleri için kayıt ol.",
   weekdayLong: "Pazar,Pazartesi,Salı,Çarşamba,Perşembe,Cuma,Cumartesi",
   monthShort: "Oca,Şub,Mar,Nis,May,Haz,Tem,Ağu,Eyl,Eki,Kas,Ara",
+  colDate: "Tarih",
+  colFirst: "İlk",
+  colRecurrence: "Tekrar",
+  colAge: "Süre",
+  noteMore: "Devamı",
+  noteLess: "Kısalt",
 } as const;
 
 export type TrKey = keyof typeof tr;

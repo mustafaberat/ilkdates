@@ -7,6 +7,8 @@ import {
   type Recurrence,
 } from "@/lib/dates";
 
+export const NOTE_MAX_LENGTH = 1000;
+
 export type EventRecord = {
   id: string;
   title: string;
@@ -52,7 +54,7 @@ export const eventInputSchema = z.object({
   note: z
     .union([z.string(), z.null(), z.undefined()])
     .transform((value) => (value ?? "").trim())
-    .pipe(z.string().max(500, "invalid_note"))
+    .pipe(z.string().max(NOTE_MAX_LENGTH, "invalid_note"))
     .transform((value) => (value ? value : null)),
 });
 

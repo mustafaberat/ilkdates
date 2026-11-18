@@ -1,6 +1,6 @@
 # İlkdates
 
-İlişkideki ilkleri (ilk el tutma, ilişki başlangıcı, ilk randevu…) tarihlerle kaydeden minimal bir web uygulaması.
+İlk tarihleri kaydeden minimal bir web uygulaması.
 
 Giriş yapmadan tarayıcıda (`localStorage`) kullanılabilir. Kayıt olunca yerel kayıtlar hesaba aktarılır.
 

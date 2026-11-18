@@ -114,7 +114,7 @@ export async function renderHomeOg() {
               fontWeight: 500,
             }}
           >
-            İlklerinize
+            İlk tarihlerinizi
           </div>
           <div
             style={{
@@ -126,7 +126,7 @@ export async function renderHomeOg() {
               fontWeight: 500,
             }}
           >
-            adres yazın.
+            kaydedin.
           </div>
           <div
             style={{
@@ -137,7 +137,7 @@ export async function renderHomeOg() {
               color: "#4A5568",
             }}
           >
-            Tarih, tekrar, bir not. Fotoğraf yok — satırlar yeter.
+            Tarih, not, yıldönümü — hepsi bir yerde.
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>

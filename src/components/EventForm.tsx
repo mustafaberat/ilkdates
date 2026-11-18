@@ -5,7 +5,7 @@ import { useEffect, useId, useState, type FormEvent } from "react";
 import { DatePicker } from "@/components/DatePicker";
 import { formatLongDate, tr } from "@/i18n/tr";
 import type { Recurrence } from "@/lib/dates";
-import type { EventInput, EventRecord } from "@/lib/events";
+import { NOTE_MAX_LENGTH, type EventInput, type EventRecord } from "@/lib/events";
 
 const EMOJIS = ["💞", "🤝", "💋", "💬", "🏡", "☕", "🌙", "✈️", "🎁"];
 const LAST_CATEGORY_KEY = "ilkdates.lastCategory";
@@ -260,11 +260,16 @@ export function EventForm({
           <label className="field">
             <span>{tr.note}</span>
             <textarea
-              maxLength={500}
+              className="note-area"
+              rows={5}
+              maxLength={NOTE_MAX_LENGTH}
               value={note}
               placeholder={tr.notePlaceholder}
               onChange={(ev) => setNote(ev.target.value)}
             />
+            <span className="hint note-count">
+              {note.length}/{NOTE_MAX_LENGTH}
+            </span>
           </label>
           {error ? <p className="error-banner">{error}</p> : null}
           <div className="actions">

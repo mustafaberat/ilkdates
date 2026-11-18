@@ -1,8 +1,11 @@
 "use client";
 
-import { formatLongDate, t, tr } from "@/i18n/tr";
-import { daysInclusive, todayMatch } from "@/lib/dates";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+
+import { formatShortDate, tr } from "@/i18n/tr";
+import { todayMatch } from "@/lib/dates";
 import type { EventRecord } from "@/lib/events";
+import { eventAgeLabel, recurrenceLabel } from "@/lib/labels";
 
 type Props = {
   events: EventRecord[];
@@ -13,41 +16,98 @@ type Props = {
 
 export function EventList({ events, today, empty, onSelect }: Props) {
   if (events.length === 0) {
-    return <p className="muted">{empty}</p>;
+    return <p className="hint">{empty}</p>;
   }
 
   return (
-    <ul className="event-list">
+    <div className="ledger-table" role="table" aria-label={tr.allFirsts}>
+      <div className="ledger-head" role="row">
+        <span role="columnheader">{tr.colDate}</span>
+        <span role="columnheader">{tr.colFirst}</span>
+        <span role="columnheader" className="ledger-rec">
+          {tr.colRecurrence}
+        </span>
+        <span role="columnheader" className="ledger-age">
+          {tr.colAge}
+        </span>
+      </div>
       {events.map((event) => {
-        const match = todayMatch(event.date, event.recurrence, today);
-        const days = event.date <= today ? daysInclusive(event.date, today) : null;
-        const meta =
-          match?.kind === "yearly" && match.years
-            ? t(tr.yearsCount, { n: match.years })
-            : match?.kind === "monthly" && match.months
-              ? t(tr.monthsCount, { n: match.months })
-              : days
-                ? t(tr.daysCount, { n: days })
-                : formatLongDate(event.date);
+        const isToday = Boolean(todayMatch(event.date, event.recurrence, today));
+        const age = eventAgeLabel(event.date, event.recurrence, today);
+        const rec = event.recurrence !== "none" ? recurrenceLabel(event.recurrence) : "";
         return (
-          <li key={event.id}>
-            <button
-              type="button"
-              className={`event-card${match ? " is-match" : ""}`}
-              onClick={() => onSelect(event)}
-            >
-              <span className="event-emoji" aria-hidden="true">
-                {event.emoji || "✦"}
+          <button
+            key={event.id}
+            type="button"
+            role="row"
+            className={`ledger-row${isToday ? " is-today" : ""}`}
+            onClick={() => onSelect(event)}
+          >
+            <span className="dt" role="cell">
+              {formatShortDate(event.date)}
+            </span>
+            <span className="ilk" role="cell">
+              <span className="ilk-title">
+                {event.emoji ? (
+                  <span className="emoji" aria-hidden="true">
+                    {event.emoji}
+                  </span>
+                ) : null}
+                <span className="ttl">{event.title}</span>
               </span>
-              <span>
-                <h3>{event.title}</h3>
-                <p>{formatLongDate(event.date)}</p>
-              </span>
-              <span className="event-meta">{meta}</span>
-            </button>
-          </li>
+              {event.note ? <EventNote text={event.note} /> : null}
+            </span>
+            <span className="ledger-rec" role="cell">
+              {rec}
+            </span>
+            <span className="meta" role="cell">
+              {age}
+            </span>
+          </button>
         );
       })}
-    </ul>
+    </div>
+  );
+}
+
+function EventNote({ text }: { text: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [clamped, setClamped] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) {
+      return;
+    }
+    const measure = () => {
+      if (open) {
+        return;
+      }
+      setClamped(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [text, open]);
+
+  function toggle(ev: MouseEvent<HTMLButtonElement>) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    setOpen((current) => !current);
+  }
+
+  return (
+    <span className="ledger-note">
+      <span ref={ref} className={`ledger-note-text${open ? " is-open" : ""}`}>
+        {text}
+      </span>
+      {clamped || open ? (
+        <button type="button" className="ledger-note-more" onClick={toggle}>
+          {open ? tr.noteLess : tr.noteMore}
+        </button>
+      ) : null}
+    </span>
   );
 }

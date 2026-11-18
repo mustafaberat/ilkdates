@@ -29,6 +29,13 @@
       "when": 1731950020000,
       "tag": "0003_drop_share_profile",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1731950030000,
+      "tag": "0004_note_varchar_1000",
+      "breakpoints": true
     }
   ]
 }

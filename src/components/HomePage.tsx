@@ -5,8 +5,9 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Calendar } from "@/components/Calendar";
 import { EventForm } from "@/components/EventForm";
+import { EventList } from "@/components/EventList";
 import { useSessionEvents } from "@/hooks/useSessionEvents";
-import { formatShortDate, formatWeekdayLong, t, tr } from "@/i18n/tr";
+import { formatWeekdayLong, t, tr } from "@/i18n/tr";
 import {
   calendarYearBounds,
   markerDatesInMonth,
@@ -14,7 +15,7 @@ import {
   todayMatch,
 } from "@/lib/dates";
 import type { EventInput, EventRecord } from "@/lib/events";
-import { eventAgeLabel, recurrenceLabel, todayStampCaption } from "@/lib/labels";
+import { recurrenceLabel, todayStampCaption } from "@/lib/labels";
 
 export function HomePage() {
   const session = useSessionEvents();
@@ -152,47 +153,25 @@ export function HomePage() {
                 ))}
               </div>
             ) : null}
-            <div className="list">
-              <h2>{tr.allFirsts}</h2>
-              {listed.length === 0 ? (
-                <p className="hint">{tr.emptyAll}</p>
-              ) : (
-                <ul>
-                  {listed.map((event) => {
-                    const isToday = Boolean(
-                      todayMatch(event.date, event.recurrence, session.today),
-                    );
-                    return (
-                      <li
-                        key={event.id}
-                        className={isToday ? "is-today" : undefined}
-                      >
-                        <button type="button" className="row-item" onClick={() => openEdit(event)}>
-                          <span className="dt">{formatShortDate(event.date)}</span>
-                          <span>
-                            {event.emoji ? `${event.emoji} ` : ""}
-                            {event.title}
-                          </span>
-                          <span className="meta">
-                            {eventAgeLabel(event.date, event.recurrence, session.today)}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-              <button type="button" className="add" onClick={openCreate}>
-                {tr.addFirst}
-              </button>
-            </div>
           </aside>
         </div>
+        <section className="ledger" aria-label={tr.allFirsts}>
+          <h2>{tr.allFirsts}</h2>
+          <EventList
+            events={listed}
+            today={session.today}
+            empty={tr.emptyAll}
+            onSelect={openEdit}
+          />
+          <button type="button" className="add" onClick={openCreate}>
+            {tr.addFirst}
+          </button>
+        </section>
       </main>
       <EventForm
         open={formOpen}
         today={session.today}
-        defaultDate={selected <= session.today ? selected : session.today}
+        defaultDate={selected}
         knownCategories={knownCategories}
         event={editing}
         busy={session.busy}
