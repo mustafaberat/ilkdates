@@ -82,6 +82,14 @@ export async function signup(
 ): Promise<SessionUser> {
   const username = rawUsername.trim();
   const db = getDb();
+  const [existing] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.usernameNormalized, normalizeUsername(username)))
+    .limit(1);
+  if (existing) {
+    throw new Error("username_taken");
+  }
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   try {
     const [user] = await db
@@ -176,13 +184,21 @@ export async function deleteAccount(userId: string, currentPassword: string): Pr
 }
 
 function isUniqueViolation(error: unknown): boolean {
-  if (!error || typeof error !== "object") {
-    return false;
-  }
-  const record = error as { code?: string; message?: string };
-  return (
-    record.code === "23505" ||
-    (typeof record.message === "string" &&
-      record.message.toLowerCase().includes("unique"))
-  );
+  const seen = new Set<unknown>();
+  const walk = (value: unknown): boolean => {
+    if (!value || typeof value !== "object" || seen.has(value)) {
+      return false;
+    }
+    seen.add(value);
+    const record = value as { code?: string; message?: string; cause?: unknown };
+    if (record.code === "23505") {
+      return true;
+    }
+    const message = `${record.message ?? ""} ${String(value)}`.toLowerCase();
+    if (message.includes("unique") || message.includes("23505")) {
+      return true;
+    }
+    return walk(record.cause);
+  };
+  return walk(error);
 }
