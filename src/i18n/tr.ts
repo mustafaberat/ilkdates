@@ -139,7 +139,7 @@ export const tr = {
   updatePassword: "Şifreyi güncelle",
   exportJson: "JSON olarak dışa aktar",
   closeAccount: "Hesabı sil",
-  closeAccountHint: "Hesabın kapatılır, giriş kalıcı olarak kapanır. İlklerin durur; bu işlem geri alınamaz.",
+  closeAccountHint: "Hesabın kalıcı olarak silinir. Bu işlem geri alınamaz.",
   closeAccountConfirm: "Hesabı silmek istediğine emin misin? Aynı kullanıcı adıyla yeniden açılamaz.",
   closeAccountButton: "Hesabı sil",
   passwordUpdated: "Şifre güncellendi.",
