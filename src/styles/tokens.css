@@ -1,0 +1,53 @@
+:root {
+  /* Palette — swap these later when the mockup is chosen. */
+  --bg: #f6efe6;
+  --bg-accent: #f0e2d4;
+  --ink: #2a1d16;
+  --ink-soft: #5c4639;
+  --muted: #8a6f60;
+  --faint: #b79c8c;
+  --line: #e4d3c5;
+  --line-strong: #d3bba9;
+  --panel: #fffaf5;
+  --panel-raised: #ffffff;
+  --accent: #c4513d;
+  --accent-hover: #a83f2e;
+  --accent-ink: #fffaf5;
+  --accent-soft: rgba(196, 81, 61, 0.14);
+  --good: #2f6f55;
+  --good-soft: rgba(47, 111, 85, 0.12);
+  --warn: #8a5a12;
+  --warn-bg: #f8e6c3;
+  --warn-line: #e6c98a;
+  --danger: #9b2c2c;
+  --danger-soft: #fde8e6;
+  --today: var(--accent);
+  --today-soft: var(--accent-soft);
+  --has-event: #2f6f55;
+
+  --shadow: 0 10px 30px rgba(42, 29, 22, 0.08);
+  --shadow-soft: 0 2px 8px rgba(42, 29, 22, 0.06);
+
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+
+  --pad-page: 12px;
+  --max-width: 440px;
+  --touch: 44px;
+  --header-h: 52px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
