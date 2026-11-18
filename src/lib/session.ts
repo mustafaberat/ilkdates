@@ -5,7 +5,7 @@ import { sessions, users, type UserRow } from "@/db/schema";
 import { hashToken, newToken } from "@/lib/crypto";
 import { getDb } from "@/lib/db";
 
-export const SESSION_COOKIE = "ilkler_session";
+export const SESSION_COOKIE = "ilkdates_session";
 const SESSION_DAYS = 30;
 
 export type SessionUser = {

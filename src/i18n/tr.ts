@@ -1,5 +1,5 @@
 export const tr = {
-  brand: "İlkler",
+  brand: "İlkdates",
   tagline: "İlklerinizi kaydedin.",
   metaDescription:
     "İlk el tutma, ilişki başlangıcı ve diğer ilk tarihlerinizi kaydedin. Giriş yapmadan da kullanabilirsiniz.",

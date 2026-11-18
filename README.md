@@ -1,17 +1,17 @@
-# İlkler
+# İlkdates
 
 İlişkideki ilkleri (ilk el tutma, ilişki başlangıcı, ilk randevu…) tarihlerle kaydeden minimal bir web uygulaması.
 
 Giriş yapmadan tarayıcıda (`localStorage`) kullanılabilir. Kayıt olunca yerel kayıtlar hesaba aktarılır.
 
-Geçici klasör/uygulama adı: **ilkler**. İsim henüz kesin değil; yeniden adlandırması kolay olsun diye seçildi.
+Klasör, npm paketi, GitHub repo ve Vercel proje adı: **ilkdates**.
 
 ## Çalıştırma (yerel, veritabanı yok)
 
 Node 24 gerekir (`.nvmrc`).
 
 ```bash
-cd ~/Projects/personal-proj/websites/ilkler
+cd ~/Projects/personal-proj/websites/ilkdates
 nvm use
 npm install
 npm run dev

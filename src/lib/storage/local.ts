@@ -8,7 +8,7 @@ import {
 } from "@/lib/events";
 import type { EventStore } from "@/lib/storage/types";
 
-export const LOCAL_STORAGE_KEY = "ilkler.events";
+export const LOCAL_STORAGE_KEY = "ilkdates.events";
 
 function nowIso(): string {
   return new Date().toISOString();
