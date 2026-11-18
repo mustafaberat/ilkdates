@@ -2,16 +2,46 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 
+import { DatePicker } from "@/components/DatePicker";
 import { formatLongDate, tr } from "@/i18n/tr";
 import type { Recurrence } from "@/lib/dates";
 import type { EventInput, EventRecord } from "@/lib/events";
 
-const EMOJIS = ["💞", "🤝", "💋", "💬", "🏡", "✈️", "🎁", "☕", "🌙", "💍"];
+const EMOJIS = ["💞", "🤝", "💋", "💬", "🏡", "☕", "🌙", "✈️", "🎁"];
+const LAST_CATEGORY_KEY = "ilkdates.lastCategory";
+
+function readLastCategory(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  try {
+    return window.localStorage.getItem(LAST_CATEGORY_KEY)?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function writeLastCategory(value: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  const trimmed = value.trim();
+  try {
+    if (trimmed) {
+      window.localStorage.setItem(LAST_CATEGORY_KEY, trimmed);
+    } else {
+      window.localStorage.removeItem(LAST_CATEGORY_KEY);
+    }
+  } catch {
+    // ignore quota / private mode
+  }
+}
 
 type Props = {
   open: boolean;
   today: string;
   defaultDate: string;
+  knownCategories?: string[];
   event?: EventRecord | null;
   busy?: boolean;
   onClose: () => void;
@@ -23,6 +53,7 @@ export function EventForm({
   open,
   today,
   defaultDate,
+  knownCategories = [],
   event,
   busy,
   onClose,
@@ -30,12 +61,14 @@ export function EventForm({
   onDelete,
 }: Props) {
   const formId = useId();
+  const categoryListId = `${formId}-categories`;
   const [title, setTitle] = useState("");
   const [date, setDate] = useState(defaultDate);
+  const [dateOpen, setDateOpen] = useState(false);
   const [emoji, setEmoji] = useState("");
   const [category, setCategory] = useState("");
-  const [note, setNote] = useState("");
   const [recurrence, setRecurrence] = useState<Recurrence>("none");
+  const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,10 +77,11 @@ export function EventForm({
     }
     setTitle(event?.title ?? "");
     setDate(event?.date ?? defaultDate);
+    setDateOpen(false);
     setEmoji(event?.emoji ?? "");
-    setCategory(event?.category ?? "");
-    setNote(event?.note ?? "");
+    setCategory(event?.category ?? (event ? "" : readLastCategory()));
     setRecurrence(event?.recurrence ?? "none");
+    setNote(event?.note ?? "");
     setError(null);
   }, [open, event, defaultDate]);
 
@@ -57,25 +91,34 @@ export function EventForm({
     }
     const onKey = (ev: KeyboardEvent) => {
       if (ev.key === "Escape") {
+        if (dateOpen) {
+          setDateOpen(false);
+          return;
+        }
         onClose();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, dateOpen]);
 
   if (!open) {
     return null;
   }
 
-  const dateTooLate = date > today;
+  const categoryChoices = knownCategories.filter(Boolean);
+  const hintParts = [
+    formatLongDate(date),
+    date < today ? "geçmiş bir güne not" : date === today ? "bugün" : "gelecek bir gün",
+    recurrence === "yearly"
+      ? "tekrar yıllık"
+      : recurrence === "monthly"
+        ? "tekrar aylık"
+        : "tekrar yok",
+  ].filter(Boolean);
 
   async function handleSubmit(ev: FormEvent) {
     ev.preventDefault();
-    if (dateTooLate) {
-      setError(tr.futureDate);
-      return;
-    }
     try {
       await onSave({
         title,
@@ -85,6 +128,9 @@ export function EventForm({
         note,
         recurrence,
       });
+      if (!event) {
+        writeLastCategory(category);
+      }
       onClose();
     } catch (caught) {
       const code = caught instanceof Error ? caught.message : "error_generic";
@@ -109,16 +155,17 @@ export function EventForm({
   }
 
   return (
-    <div className="overlay" role="presentation" onClick={onClose}>
-      <div
-        className="sheet"
+    <>
+      <div className="dim" role="presentation" onClick={onClose} />
+      <aside
+        className="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${formId}-title`}
         onClick={(ev) => ev.stopPropagation()}
       >
-        <div className="sheet-handle" />
         <h2 id={`${formId}-title`}>{event ? tr.editEvent : tr.addEvent}</h2>
+        <p className="hint">{hintParts.join(" · ")}</p>
         <form onSubmit={handleSubmit}>
           <label className="field">
             <span>{tr.title}</span>
@@ -131,16 +178,16 @@ export function EventForm({
               autoFocus
             />
           </label>
-          <label className="field">
+          <div className="field">
             <span>{tr.date}</span>
-            <input
-              type="date"
-              required
-              max={today}
+            <DatePicker
               value={date}
-              onChange={(ev) => setDate(ev.target.value)}
+              today={today}
+              open={dateOpen}
+              onOpenChange={setDateOpen}
+              onChange={setDate}
             />
-          </label>
+          </div>
           <div className="field">
             <span>{tr.emoji}</span>
             <div className="emoji-row">
@@ -148,7 +195,7 @@ export function EventForm({
                 <button
                   key={item}
                   type="button"
-                  className={emoji === item ? "is-on" : undefined}
+                  className={emoji === item ? "on" : undefined}
                   onClick={() => setEmoji((current) => (current === item ? "" : item))}
                   aria-label={item}
                 >
@@ -159,16 +206,38 @@ export function EventForm({
           </div>
           <label className="field">
             <span>{tr.category}</span>
+            {categoryChoices.length > 0 ? (
+              <div className="emoji-row" role="group" aria-label={tr.category}>
+                {categoryChoices.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={category === item ? "on" : undefined}
+                    onClick={() =>
+                      setCategory((current) => (current === item ? "" : item))
+                    }
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <input
               maxLength={40}
               value={category}
+              list={categoryListId}
               placeholder={tr.categoryPlaceholder}
               onChange={(ev) => setCategory(ev.target.value)}
             />
+            <datalist id={categoryListId}>
+              {categoryChoices.map((item) => (
+                <option key={item} value={item} />
+              ))}
+            </datalist>
           </label>
           <div className="field">
             <span>{tr.recurrence}</span>
-            <div className="segmented" role="group">
+            <div className="seg" role="group" aria-label={tr.recurrence}>
               {(
                 [
                   ["none", tr.recurrenceNone],
@@ -179,7 +248,8 @@ export function EventForm({
                 <button
                   key={value}
                   type="button"
-                  className={recurrence === value ? "is-on" : undefined}
+                  className={recurrence === value ? "on" : undefined}
+                  aria-pressed={recurrence === value}
                   onClick={() => setRecurrence(value)}
                 >
                   {label}
@@ -196,32 +266,28 @@ export function EventForm({
               onChange={(ev) => setNote(ev.target.value)}
             />
           </label>
-          {dateTooLate ? <p className="error-banner">{tr.futureDate}</p> : null}
           {error ? <p className="error-banner">{error}</p> : null}
-          <div className="sheet-actions">
-            <button type="button" className="btn btn-line" onClick={onClose} disabled={busy}>
+          <div className="actions">
+            <button type="button" className="btn-line" onClick={onClose} disabled={busy}>
               {tr.cancel}
             </button>
-            <button type="submit" className="btn btn-primary" disabled={busy || dateTooLate}>
+            <button type="submit" className="btn-fill" disabled={busy}>
               {tr.save}
             </button>
             {event && onDelete ? (
-              <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={busy}>
+              <button type="button" className="btn-danger" onClick={handleDelete} disabled={busy}>
                 {tr.delete}
               </button>
             ) : null}
           </div>
         </form>
-        <p className="sr-only">{formatLongDate(date)}</p>
-      </div>
-    </div>
+      </aside>
+    </>
   );
 }
 
 function messageFor(code: string): string {
   switch (code) {
-    case "future_date":
-      return tr.futureDate;
     case "invalid_title":
       return tr.invalidTitle;
     case "invalid_date":

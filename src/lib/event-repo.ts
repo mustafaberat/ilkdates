@@ -1,10 +1,8 @@
 import { and, asc, eq } from "drizzle-orm";
 
 import { events, type EventRow } from "@/db/schema";
-import { todayInTimeZone } from "@/lib/dates";
 import { getDb } from "@/lib/db";
 import {
-  assertNotFuture,
   parseEventInput,
   type EventParsed,
   type EventRecord,
@@ -24,10 +22,6 @@ function toRecord(row: EventRow): EventRecord {
   };
 }
 
-function todayStamp(): string {
-  return todayInTimeZone("Europe/Istanbul");
-}
-
 export async function listEvents(userId: string): Promise<EventRecord[]> {
   const db = getDb();
   const rows = await db
@@ -41,10 +35,8 @@ export async function listEvents(userId: string): Promise<EventRecord[]> {
 export async function createEvent(
   userId: string,
   raw: unknown,
-  today = todayStamp(),
 ): Promise<EventRecord> {
   const input = parseEventInput(raw);
-  assertNotFuture(input.date, today);
   const db = getDb();
   const values = {
     userId,
@@ -67,10 +59,8 @@ export async function updateEvent(
   userId: string,
   id: string,
   raw: unknown,
-  today = todayStamp(),
 ): Promise<EventRecord> {
   const input = parseEventInput(raw);
-  assertNotFuture(input.date, today);
   const db = getDb();
   const [row] = await db
     .update(events)
@@ -102,26 +92,31 @@ export async function deleteEvent(userId: string, id: string): Promise<void> {
   }
 }
 
+export type MigrateResult = {
+  events: EventRecord[];
+  imported: number;
+};
+
 export async function migrateEvents(
   userId: string,
   rawEvents: unknown[],
-  today = todayStamp(),
-): Promise<EventRecord[]> {
+): Promise<MigrateResult> {
   const existing = await listEvents(userId);
   const existingIds = new Set(existing.map((event) => event.id));
+  let imported = 0;
   for (const raw of rawEvents) {
     let parsed: EventParsed;
     try {
       parsed = parseEventInput(raw);
-      assertNotFuture(parsed.date, today);
     } catch {
       continue;
     }
     if (parsed.id && existingIds.has(parsed.id)) {
       continue;
     }
-    const created = await createEvent(userId, parsed, today);
+    const created = await createEvent(userId, parsed);
     existingIds.add(created.id);
+    imported += 1;
   }
-  return listEvents(userId);
+  return { events: await listEvents(userId), imported };
 }

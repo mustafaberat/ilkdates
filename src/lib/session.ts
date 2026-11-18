@@ -4,17 +4,18 @@ import { and, eq, gt } from "drizzle-orm";
 import { sessions, users, type UserRow } from "@/db/schema";
 import { hashToken, newToken } from "@/lib/crypto";
 import { getDb } from "@/lib/db";
+import { type SessionUser } from "@/lib/profile";
 
 export const SESSION_COOKIE = "ilkdates_session";
 const SESSION_DAYS = 30;
 
-export type SessionUser = {
-  id: string;
-  username: string;
-};
+export type { SessionUser };
 
-function publicUser(row: UserRow): SessionUser {
-  return { id: row.id, username: row.username };
+export function publicUser(row: UserRow): SessionUser {
+  return {
+    id: row.id,
+    username: row.username,
+  };
 }
 
 export function sessionExpiryDate(from = new Date()): Date {
@@ -73,7 +74,15 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     .where(and(eq(sessions.tokenHash, tokenHash), gt(sessions.expiresAt, new Date())))
     .limit(1);
   const row = rows[0];
-  return row ? publicUser(row.user) : null;
+  if (!row) {
+    return null;
+  }
+  if (row.user.active === false) {
+    await db.delete(sessions).where(eq(sessions.id, row.sessionId));
+    await clearSessionCookie();
+    return null;
+  }
+  return publicUser(row.user);
 }
 
 export async function requireUser(): Promise<SessionUser> {
@@ -90,5 +99,11 @@ export async function destroySession(): Promise<void> {
     const db = getDb();
     await db.delete(sessions).where(eq(sessions.tokenHash, hashToken(token)));
   }
+  await clearSessionCookie();
+}
+
+export async function destroyAllSessionsForUser(userId: string): Promise<void> {
+  const db = getDb();
+  await db.delete(sessions).where(eq(sessions.userId, userId));
   await clearSessionCookie();
 }

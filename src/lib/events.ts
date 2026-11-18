@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import {
   DATE_RE,
-  isDateOnOrBefore,
   isValidYmd,
   parseISODate,
   type Recurrence,
@@ -40,23 +39,20 @@ export const eventInputSchema = z.object({
     .pipe(z.string().min(1, "invalid_title").max(80, "invalid_title")),
   date: isoDateSchema,
   emoji: z
-    .string()
-    .trim()
-    .max(16, "invalid_emoji")
-    .optional()
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((value) => (value ?? "").trim())
+    .pipe(z.string().max(16, "invalid_emoji"))
     .transform((value) => (value ? value : null)),
   category: z
-    .string()
-    .transform((value) => value.replace(/\s+/g, " ").trim())
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((value) => (value ?? "").replace(/\s+/g, " ").trim())
     .pipe(z.string().max(40, "invalid_category"))
-    .optional()
     .transform((value) => (value ? value : null)),
   recurrence: recurrenceSchema.default("none"),
   note: z
-    .string()
-    .transform((value) => value.trim())
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((value) => (value ?? "").trim())
     .pipe(z.string().max(500, "invalid_note"))
-    .optional()
     .transform((value) => (value ? value : null)),
 });
 
@@ -65,12 +61,6 @@ export type EventParsed = z.output<typeof eventInputSchema>;
 
 export function parseEventInput(raw: unknown): EventParsed {
   return eventInputSchema.parse(raw);
-}
-
-export function assertNotFuture(date: string, today: string): void {
-  if (!isDateOnOrBefore(date, today)) {
-    throw new Error("future_date");
-  }
 }
 
 export function sortEvents(events: EventRecord[]): EventRecord[] {

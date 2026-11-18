@@ -171,3 +171,92 @@ export function monthGrid(year: number, month: number): (Ymd | null)[] {
   }
   return cells;
 }
+
+export function occursOnDate(
+  eventDate: string,
+  recurrence: Recurrence,
+  target: string,
+): boolean {
+  if (utcMillis(target) < utcMillis(eventDate)) {
+    return false;
+  }
+  if (eventDate === target) {
+    return true;
+  }
+  if (recurrence === "yearly") {
+    return isYearlyMatch(eventDate, target);
+  }
+  if (recurrence === "monthly") {
+    return isMonthlyMatch(eventDate, target);
+  }
+  return false;
+}
+
+export function markerDatesInMonth(
+  events: Array<{ date: string; recurrence: Recurrence }>,
+  year: number,
+  month: number,
+): Set<string> {
+  const marked = new Set<string>();
+  const count = daysInMonth(year, month);
+  for (let day = 1; day <= count; day += 1) {
+    const iso = toISODate(year, month, day);
+    if (events.some((event) => occursOnDate(event.date, event.recurrence, iso))) {
+      marked.add(iso);
+    }
+  }
+  return marked;
+}
+
+export function formatPostmark(iso: string): string {
+  const { y, m, d } = parseISODate(iso);
+  return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}.${String(y).slice(2)}`;
+}
+
+
+export function calendarYearBounds(input: {
+  today: string;
+  viewingYear: number;
+  relationshipStart?: string | null;
+  eventDates?: string[];
+}): { minYear: number; maxYear: number } {
+  const todayY = parseISODate(input.today).y;
+  const years = [todayY, input.viewingYear];
+  if (input.relationshipStart) {
+    years.push(parseISODate(input.relationshipStart).y);
+  }
+  for (const iso of input.eventDates ?? []) {
+    years.push(parseISODate(iso).y);
+  }
+  return {
+    minYear: Math.min(...years),
+    maxYear: Math.max(todayY + 10, input.viewingYear),
+  };
+}
+
+export function yearList(minYear: number, maxYear: number): number[] {
+  const start = Math.min(minYear, maxYear);
+  const end = Math.max(minYear, maxYear);
+  const years: number[] = [];
+  for (let year = end; year >= start; year -= 1) {
+    years.push(year);
+  }
+  return years;
+}
+
+
+/** The chronologically first event date, or null when the list is empty. */
+export function earliestEventDate(dates: string[]): string | null {
+  let earliest: string | null = null;
+  for (const iso of dates) {
+    try {
+      parseISODate(iso);
+    } catch {
+      continue;
+    }
+    if (earliest === null || iso < earliest) {
+      earliest = iso;
+    }
+  }
+  return earliest;
+}

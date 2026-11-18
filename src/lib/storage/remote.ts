@@ -66,14 +66,32 @@ export async function logoutRequest(): Promise<void> {
   await request("/api/auth/logout", { method: "POST" });
 }
 
+export async function updateAccountRequest(input: {
+  currentPassword: string;
+  username?: string;
+  newPassword?: string;
+}): Promise<SessionUser> {
+  const data = await request<{ user: SessionUser }>("/api/auth/account", {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+  return data.user;
+}
+
+export async function deleteAccountRequest(currentPassword: string): Promise<void> {
+  await request("/api/auth/account", {
+    method: "DELETE",
+    body: JSON.stringify({ currentPassword }),
+  });
+}
+
 export async function migrateLocalEvents(
   events: EventRecord[],
-): Promise<EventRecord[]> {
-  const data = await request<{ events: EventRecord[] }>("/api/events/migrate", {
+): Promise<{ events: EventRecord[]; imported: number }> {
+  return request<{ events: EventRecord[]; imported: number }>("/api/events/migrate", {
     method: "POST",
     body: JSON.stringify({ events }),
   });
-  return data.events;
 }
 
 export const remoteStore: EventStore = {

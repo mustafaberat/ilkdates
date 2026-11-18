@@ -1,9 +1,7 @@
 import type { EventInput, EventRecord } from "@/lib/events";
+import type { SessionUser } from "@/lib/profile";
 
-export type SessionUser = {
-  id: string;
-  username: string;
-};
+export type { SessionUser };
 
 export type EventStore = {
   list(): Promise<EventRecord[]>;

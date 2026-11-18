@@ -12,8 +12,8 @@ export async function POST(request: Request) {
     if (!incoming) {
       return errorResponse("invalid_body");
     }
-    const events = await migrateEvents(user.id, incoming);
-    return NextResponse.json({ events });
+    const result = await migrateEvents(user.id, incoming);
+    return NextResponse.json(result);
   } catch (error) {
     return handleRouteError(error);
   }

@@ -1,10 +1,11 @@
 import {
+  boolean,
+  date,
   index,
   pgEnum,
   pgTable,
   text,
   timestamp,
-  date,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -18,6 +19,7 @@ export const users = pgTable("users", {
     .notNull()
     .unique(),
   passwordHash: text("password_hash").notNull(),
+  active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -66,6 +68,7 @@ export const events = pgTable(
     userDateIdx: index("events_user_id_date_idx").on(table.userId, table.date),
   }),
 );
+
 
 export type UserRow = typeof users.$inferSelect;
 export type EventRow = typeof events.$inferSelect;

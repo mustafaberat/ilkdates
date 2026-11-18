@@ -2,28 +2,33 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useInitialUser } from "@/components/SessionProvider";
 import { todayInTimeZone } from "@/lib/dates";
 import { sortEvents, type EventInput, type EventRecord } from "@/lib/events";
 import {
   clearLocalEvents,
   localStore,
   peekLocalEvents,
+  writeLocalEvents,
 } from "@/lib/storage/local";
 import {
   ApiError,
+  deleteAccountRequest,
   fetchMe,
   logoutRequest,
   migrateLocalEvents,
   remoteStore,
+  updateAccountRequest,
 } from "@/lib/storage/remote";
 import type { EventStore, SessionUser } from "@/lib/storage/types";
 
 export type StoreMode = "local" | "remote";
 
 export function useSessionEvents() {
-  const [user, setUser] = useState<SessionUser | null>(null);
+  const initialUser = useInitialUser();
+  const [user, setUser] = useState<SessionUser | null>(initialUser ?? null);
   const [events, setEvents] = useState<EventRecord[]>([]);
-  const [mode, setMode] = useState<StoreMode>("local");
+  const [mode, setMode] = useState<StoreMode>(initialUser ? "remote" : "local");
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -50,10 +55,18 @@ export function useSessionEvents() {
         const local = peekLocalEvents();
         try {
           if (local.length > 0) {
-            const merged = await migrateLocalEvents(local);
-            clearLocalEvents();
+            const { events: merged, imported } = await migrateLocalEvents(local);
+            const serverIds = new Set(merged.map((event) => event.id));
+            const leftover = local.filter((event) => !serverIds.has(event.id));
+            if (leftover.length === 0) {
+              clearLocalEvents();
+            } else {
+              writeLocalEvents(leftover);
+            }
             setEvents(sortEvents(merged));
-            setNotice(`migrated:${local.length}`);
+            if (imported > 0) {
+              setNotice(`migrated:${imported}`);
+            }
           } else {
             await refresh(remoteStore);
           }
@@ -61,6 +74,8 @@ export function useSessionEvents() {
           await refresh(remoteStore);
         }
       } else {
+        setUser(null);
+        setMode("local");
         setEvents(peekLocalEvents());
       }
       setReady(true);
@@ -125,6 +140,32 @@ export function useSessionEvents() {
     });
   }, [run]);
 
+  const updateAccount = useCallback(
+    async (input: {
+      currentPassword: string;
+      username?: string;
+      newPassword?: string;
+    }) => {
+      await run(async () => {
+        const next = await updateAccountRequest(input);
+        setUser(next);
+      });
+    },
+    [run],
+  );
+
+  const deleteAccount = useCallback(
+    async (currentPassword: string) => {
+      await run(async () => {
+        await deleteAccountRequest(currentPassword);
+        setUser(null);
+        setMode("local");
+        setEvents(peekLocalEvents());
+      });
+    },
+    [run],
+  );
+
   return {
     user,
     events,
@@ -140,5 +181,7 @@ export function useSessionEvents() {
     update,
     remove,
     logout,
+    updateAccount,
+    deleteAccount,
   };
 }

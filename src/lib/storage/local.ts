@@ -1,6 +1,4 @@
-import { todayInTimeZone } from "@/lib/dates";
 import {
-  assertNotFuture,
   parseEventInput,
   sortEvents,
   type EventInput,
@@ -45,13 +43,23 @@ export function clearLocalEvents(): void {
   window.localStorage.removeItem(LOCAL_STORAGE_KEY);
 }
 
+export function writeLocalEvents(events: EventRecord[]): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  if (events.length === 0) {
+    clearLocalEvents();
+    return;
+  }
+  writeAll(events);
+}
+
 export const localStore: EventStore = {
   async list() {
     return sortEvents(readAll());
   },
   async create(input: EventInput) {
     const parsed = parseEventInput(input);
-    assertNotFuture(parsed.date, todayInTimeZone());
     const now = nowIso();
     const record: EventRecord = {
       id: parsed.id ?? crypto.randomUUID(),
@@ -71,7 +79,6 @@ export const localStore: EventStore = {
   },
   async update(id, input) {
     const parsed = parseEventInput(input);
-    assertNotFuture(parsed.date, todayInTimeZone());
     const events = readAll();
     const index = events.findIndex((event) => event.id === id);
     if (index < 0) {

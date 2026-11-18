@@ -18,6 +18,7 @@ export type ApiErrorCode =
   | "unauthorized"
   | "auth_unavailable"
   | "invalid_body"
+  | "account_closed"
   | "error_generic";
 
 const STATUS: Record<ApiErrorCode, number> = {
@@ -35,6 +36,7 @@ const STATUS: Record<ApiErrorCode, number> = {
   unauthorized: 401,
   auth_unavailable: 503,
   invalid_body: 400,
+  account_closed: 403,
   error_generic: 500,
 };
 

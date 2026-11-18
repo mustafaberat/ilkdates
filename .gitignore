@@ -49,3 +49,7 @@ tsconfig.tsbuildinfo
 
 # Vercel
 .vercel
+
+# Design references and implementation screenshots (local only)
+/design/
+/screenshots/
