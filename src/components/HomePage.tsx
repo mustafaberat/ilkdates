@@ -120,6 +120,7 @@ export function HomePage() {
             events={session.events}
             today={session.today}
             selected={selected}
+            ready={session.ready}
             onAdd={openCreate}
             onSelectEvent={openEdit}
           />

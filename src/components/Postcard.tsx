@@ -18,11 +18,12 @@ type Props = {
   events: EventRecord[];
   today: string;
   selected: string;
+  ready?: boolean;
   onAdd: () => void;
   onSelectEvent?: (event: EventRecord) => void;
 };
 
-export function Postcard({ events, today, selected, onAdd, onSelectEvent }: Props) {
+export function Postcard({ events, today, selected, ready = true, onAdd, onSelectEvent }: Props) {
   const onSelected = events
     .filter((event) => event.date === selected)
     .sort((a, b) => a.title.localeCompare(b.title, "tr"));
@@ -33,7 +34,9 @@ export function Postcard({ events, today, selected, onAdd, onSelectEvent }: Prop
       <div className="when">{formatWeekdayLong(selected)}</div>
       <div className="today-box postcard">
         <div className="kicker">{isToday ? tr.todayStamp : tr.selectedDay}</div>
-        {onSelected.length > 0 ? (
+        {!ready ? (
+          <p className="hint">{tr.loading}</p>
+        ) : onSelected.length > 0 ? (
           onSelected.map((event) => (
             <PostcardEvent
               key={event.id}
