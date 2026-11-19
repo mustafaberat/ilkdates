@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Archivo, Newsreader } from "next/font/google";
 
-import { SessionProvider } from "@/components/SessionProvider";
+import { SessionProvider } from "@/components/layout/SessionProvider";
 import { tr } from "@/i18n/tr";
-import { getSessionUser } from "@/lib/session";
+import { getSessionUser } from "@/lib/auth/session";
 import { siteUrl } from "@/lib/site";
 
 import "./globals.css";

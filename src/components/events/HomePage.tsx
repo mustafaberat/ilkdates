@@ -2,19 +2,19 @@
 
 import { useMemo, useState } from "react";
 
-import { AppShell } from "@/components/AppShell";
-import { Calendar } from "@/components/Calendar";
-import { EventForm } from "@/components/EventForm";
-import { EventList } from "@/components/EventList";
-import { Postcard } from "@/components/Postcard";
+import { AppShell } from "@/components/layout/AppShell";
+import { Calendar } from "@/components/calendar/Calendar";
+import { EventForm } from "@/components/events/EventForm";
+import { EventList } from "@/components/events/EventList";
+import { Postcard } from "@/components/postcard/Postcard";
 import { useSessionEvents } from "@/hooks/useSessionEvents";
 import { t, tr } from "@/i18n/tr";
 import {
   calendarYearBounds,
   markerDatesInMonth,
   parseISODate,
-} from "@/lib/dates";
-import type { EventInput, EventRecord } from "@/lib/events";
+} from "@/lib/domain/dates";
+import type { EventInput, EventRecord } from "@/lib/domain/events";
 
 export function HomePage() {
   const session = useSessionEvents();

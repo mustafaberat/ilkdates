@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { SessionUser } from "@/lib/profile";
+import type { SessionUser } from "@/lib/domain/profile";
 
 type SessionContextValue = {
   initialUser: SessionUser | null | undefined;

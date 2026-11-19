@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { formatLongDate, formatMonthYear, monthNames, tr, weekdays } from "@/i18n/tr";
-import { addMonths, monthGrid, parseISODate, toISODate } from "@/lib/dates";
+import { addMonths, monthGrid, parseISODate, toISODate } from "@/lib/domain/dates";
 
 type View = "days" | "months" | "years";
 

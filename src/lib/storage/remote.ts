@@ -1,4 +1,4 @@
-import type { EventInput, EventRecord } from "@/lib/events";
+import type { EventInput, EventRecord } from "@/lib/domain/events";
 import type { EventStore, SessionUser } from "@/lib/storage/types";
 
 export class ApiError extends Error {

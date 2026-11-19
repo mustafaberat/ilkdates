@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { AppShell } from "@/components/AppShell";
+import { AppShell } from "@/components/layout/AppShell";
 import { tr } from "@/i18n/tr";
 import { ApiError, loginRequest, signupRequest } from "@/lib/storage/remote";
 

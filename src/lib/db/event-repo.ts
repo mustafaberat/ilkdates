@@ -1,12 +1,12 @@
 import { and, asc, eq } from "drizzle-orm";
 
-import { events, type EventRow } from "@/db/schema";
+import { events, type EventRow } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 import {
   parseEventInput,
   type EventParsed,
   type EventRecord,
-} from "@/lib/events";
+} from "@/lib/domain/events";
 
 function toRecord(row: EventRow): EventRecord {
   return {

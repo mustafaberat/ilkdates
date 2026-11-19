@@ -1,18 +1,18 @@
 "use client";
 
-import { formatWeekdayLong, t, tr } from "@/i18n/tr";
+import { t, tr } from "@/i18n/tr";
 import {
   daysBetween,
   mostRecentPastDate,
   nearestFutureDate,
   nextUpcomingAnniversary,
-} from "@/lib/dates";
-import type { EventRecord } from "@/lib/events";
+} from "@/lib/domain/dates";
+import type { EventRecord } from "@/lib/domain/events";
 import {
   anniversaryCaption,
   elapsedCaption,
   nextAnniversaryCaption,
-} from "@/lib/labels";
+} from "@/lib/domain/labels";
 
 type Props = {
   events: EventRecord[];
@@ -31,7 +31,6 @@ export function Postcard({ events, today, selected, ready = true, onAdd, onSelec
 
   return (
     <aside className="side">
-      <div className="when">{formatWeekdayLong(selected)}</div>
       <div className="today-box postcard">
         <div className="kicker">{isToday ? tr.todayStamp : tr.selectedDay}</div>
         {!ready ? (

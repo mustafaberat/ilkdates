@@ -1,5 +1,5 @@
-import type { EventInput, EventRecord } from "@/lib/events";
-import type { SessionUser } from "@/lib/profile";
+import type { EventInput, EventRecord } from "@/lib/domain/events";
+import type { SessionUser } from "@/lib/domain/profile";
 
 export type { SessionUser };
 

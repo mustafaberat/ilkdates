@@ -2,9 +2,9 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 
-import { DatePicker } from "@/components/DatePicker";
+import { DatePicker } from "@/components/calendar/DatePicker";
 import { formatLongDate, tr } from "@/i18n/tr";
-import { NOTE_MAX_LENGTH, type EventInput, type EventRecord } from "@/lib/events";
+import { NOTE_MAX_LENGTH, type EventInput, type EventRecord } from "@/lib/domain/events";
 
 const EMOJIS = ["💞", "🤝", "💋", "💬", "🏡", "☕", "🌙", "✈️", "🎁"];
 const LAST_CATEGORY_KEY = "ilkdates.lastCategory";

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { errorResponse, handleRouteError } from "@/lib/api";
-import { migrateEvents } from "@/lib/event-repo";
-import { requireUser } from "@/lib/session";
+import { migrateEvents } from "@/lib/db/event-repo";
+import { requireUser } from "@/lib/auth/session";
 
 export async function POST(request: Request) {
   try {

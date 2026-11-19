@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { and, eq, gt } from "drizzle-orm";
 
-import { sessions, users, type UserRow } from "@/db/schema";
-import { hashToken, newToken } from "@/lib/crypto";
+import { sessions, users, type UserRow } from "@/lib/db/schema";
+import { hashToken, newToken } from "@/lib/auth/crypto";
 import { getDb } from "@/lib/db";
-import { type SessionUser } from "@/lib/profile";
+import { type SessionUser } from "@/lib/domain/profile";
 
 export const SESSION_COOKIE = "ilkdates_session";
 const SESSION_DAYS = 30;

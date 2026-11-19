@@ -17,9 +17,9 @@ import {
   todayInTimeZone,
   yearlyOccurrence,
   yearList,
-} from "@/lib/dates";
-import { anniversaryCaption, elapsedCaption } from "@/lib/labels";
-import { eventInputSchema } from "@/lib/events";
+} from "@/lib/domain/dates";
+import { anniversaryCaption, elapsedCaption } from "@/lib/domain/labels";
+import { eventInputSchema } from "@/lib/domain/events";
 
 describe("daysInclusive", () => {
   it("counts the start date as day 1", () => {

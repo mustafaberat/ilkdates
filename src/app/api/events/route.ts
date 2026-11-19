@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api";
-import { createEvent, listEvents } from "@/lib/event-repo";
-import { requireUser } from "@/lib/session";
+import { createEvent, listEvents } from "@/lib/db/event-repo";
+import { requireUser } from "@/lib/auth/session";
 
 export async function GET() {
   try {

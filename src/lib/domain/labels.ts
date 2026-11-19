@@ -4,7 +4,7 @@ import {
   daysInclusive,
   nextAnniversary,
   type Anniversary,
-} from "@/lib/dates";
+} from "@/lib/domain/dates";
 
 export function eventAgeLabel(date: string, today: string): string {
   const delta = daysBetween(date, today);

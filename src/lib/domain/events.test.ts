@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { NOTE_MAX_LENGTH, eventInputSchema, parseEventInput } from "@/lib/events";
+import { NOTE_MAX_LENGTH, eventInputSchema, parseEventInput } from "@/lib/domain/events";
 
 const base = {
   title: "Kaydırak",

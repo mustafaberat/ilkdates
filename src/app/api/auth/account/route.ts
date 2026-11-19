@@ -7,7 +7,7 @@ import {
   updateAccount,
 } from "@/lib/auth";
 import { errorResponse, handleRouteError } from "@/lib/api";
-import { requireUser } from "@/lib/session";
+import { requireUser } from "@/lib/auth/session";
 
 export async function PATCH(request: Request) {
   try {

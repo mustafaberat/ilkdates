@@ -2,15 +2,15 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { users } from "@/db/schema";
+import { users } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
-import { type SessionUser } from "@/lib/profile";
+import { type SessionUser } from "@/lib/domain/profile";
 import {
   createSession,
   destroyAllSessionsForUser,
   publicUser,
   setSessionCookie,
-} from "@/lib/session";
+} from "@/lib/auth/session";
 
 const USERNAME_RE = /^[a-zA-Z0-9._-]{3,32}$/;
 const BCRYPT_ROUNDS = 10;

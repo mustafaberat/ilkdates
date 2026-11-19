@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api";
 import { DatabaseUnavailableError, isDatabaseConfigured } from "@/lib/db";
-import { clearSessionCookie, destroySession } from "@/lib/session";
+import { clearSessionCookie, destroySession } from "@/lib/auth/session";
 
 export async function POST() {
   try {

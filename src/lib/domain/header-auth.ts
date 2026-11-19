@@ -1,4 +1,4 @@
-import type { SessionUser } from "@/lib/profile";
+import type { SessionUser } from "@/lib/domain/profile";
 
 export type HeaderAuth = "member" | "guest" | "unknown";
 

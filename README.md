@@ -57,12 +57,26 @@ Bunlar onayınla yapılacak işler. Bu repoda Vercel projesi, veritabanı, GitHu
 6. Deploy et (`vercel --prod` veya git push sonrası otomatik deploy).
 7. İstersen `vercel env pull .env.local` ile yerel giriş testini aç.
 
+## Klasör yapısı
+
+Kaynak kod `src/` altındadır:
+
+- `app/` — Next.js rotaları, API ve global stiller
+- `components/` — özellik klasörleri: `layout`, `calendar`, `events`, `postcard`, `account`
+- `hooks/` — istemci kancaları
+- `i18n/` — Türkçe metinler
+- `lib/domain/` — tarih, olay ve etiket mantığı
+- `lib/db/` — şema, bağlantı ve olay deposu
+- `lib/auth/` — hesap, oturum, çerez
+- `lib/storage/` — yerel ve uzak depolama
+- `styles/` — tasarım token'ları
+
 ## Tasarım
 
-Renk, yazı tipi, boşluk ve yarıçaplar `src/styles/tokens.css` içinde. Seçilen mockup sonra bu değişkenlerle uygulanabilir. Arayüz metinleri `src/i18n/tr.ts` dosyasında.
+Renk, yazı tipi ve boşluklar `src/styles/tokens.css` içindedir. Arayüz metinleri `src/i18n/tr.ts` dosyasındadır.
 
 ## Notlar
 
-- V1'de tekrar alanı (`none` / `monthly` / `yearly`) saklanır; takvim senkronu veya bildirim yoktur.
-- Tarihler `YYYY-MM-DD` olarak tutulur. "Bugün" tarayıcıda `Europe/Istanbul` dilimine göre hesaplanır.
+- Yıldönümleri saklanmaz; seçilen günden hesaplanır. Takvim senkronu veya bildirim yoktur.
+- Tarihler `YYYY-MM-DD` olarak tutulur. "Bugün" `Europe/Istanbul` dilimine göre hesaplanır.
 - Düzen 320×568 ekrana sığacak şekilde kuruldu.

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
-import { AppShell } from "@/components/AppShell";
+import { AppShell } from "@/components/layout/AppShell";
 import { useSessionEvents } from "@/hooks/useSessionEvents";
 import { tr } from "@/i18n/tr";
 

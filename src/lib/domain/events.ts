@@ -4,7 +4,7 @@ import {
   DATE_RE,
   isValidYmd,
   parseISODate,
-} from "@/lib/dates";
+} from "@/lib/domain/dates";
 
 export const NOTE_MAX_LENGTH = 1000;
 

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { useInitialUser } from "@/components/SessionProvider";
+import { useInitialUser } from "@/components/layout/SessionProvider";
 import { formatWeekdayLong, tr } from "@/i18n/tr";
-import { todayInTimeZone } from "@/lib/dates";
-import { headerAuthState } from "@/lib/header-auth";
-import type { SessionUser } from "@/lib/profile";
+import { todayInTimeZone } from "@/lib/domain/dates";
+import { headerAuthState } from "@/lib/domain/header-auth";
+import type { SessionUser } from "@/lib/domain/profile";
 
 type Props = {
   user?: SessionUser | null;
@@ -42,7 +42,7 @@ export function SiteHeader({
   return (
     <header className="mast">
       <div className="mast-inner">
-        <p className="issue">{tr.issueLine}</p>
+        <p className="dateline">{formatWeekdayLong(today)}</p>
         <Wordmark />
         <nav className="nav-links">
           <Link href="/" className={onCalendar ? "is-on" : undefined}>
@@ -63,9 +63,7 @@ export function SiteHeader({
         </nav>
       </div>
       <div className="deck">
-        <p className="dateline">{formatWeekdayLong(today)}</p>
         <p className="motto">{tr.tagline}</p>
-        <p className="folio">{tr.folio}</p>
       </div>
     </header>
   );

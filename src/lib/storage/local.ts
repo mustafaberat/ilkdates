@@ -3,7 +3,7 @@ import {
   sortEvents,
   type EventInput,
   type EventRecord,
-} from "@/lib/events";
+} from "@/lib/domain/events";
 import type { EventStore } from "@/lib/storage/types";
 
 export const LOCAL_STORAGE_KEY = "ilkdates.events";

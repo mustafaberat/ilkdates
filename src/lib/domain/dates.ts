@@ -209,12 +209,6 @@ export function markerDatesInMonth(
   );
 }
 
-export function formatPostmark(iso: string): string {
-  const { y, m, d } = parseISODate(iso);
-  return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}.${String(y).slice(2)}`;
-}
-
-
 export function calendarYearBounds(input: {
   today: string;
   viewingYear: number;

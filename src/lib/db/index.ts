@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
 
-import * as schema from "@/db/schema";
+import * as schema from "@/lib/db/schema";
 
 export class DatabaseUnavailableError extends Error {
   status = 503;

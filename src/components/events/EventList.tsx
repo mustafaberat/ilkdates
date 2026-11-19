@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import { formatShortDate, tr } from "@/i18n/tr";
-import type { EventRecord } from "@/lib/events";
-import { eventAgeLabel } from "@/lib/labels";
+import type { EventRecord } from "@/lib/domain/events";
+import { eventAgeLabel } from "@/lib/domain/labels";
 
 type Props = {
   events: EventRecord[];

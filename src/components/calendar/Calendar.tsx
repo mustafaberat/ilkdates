@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { monthNames, tr } from "@/i18n/tr";
-import { addMonths, monthGrid, toISODate, yearList } from "@/lib/dates";
+import { addMonths, monthGrid, toISODate, yearList } from "@/lib/domain/dates";
 
 type Props = {
   year: number;

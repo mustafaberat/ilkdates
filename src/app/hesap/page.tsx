@@ -1,4 +1,4 @@
-import { AccountPage } from "@/components/AccountPage";
+import { AccountPage } from "@/components/account/AccountPage";
 import { tr } from "@/i18n/tr";
 
 export const metadata = {

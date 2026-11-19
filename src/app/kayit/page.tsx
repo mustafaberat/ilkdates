@@ -1,4 +1,4 @@
-import { AuthForm } from "@/components/AuthForm";
+import { AuthForm } from "@/components/account/AuthForm";
 import { tr } from "@/i18n/tr";
 
 export const metadata = {

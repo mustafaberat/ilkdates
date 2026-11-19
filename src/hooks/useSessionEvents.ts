@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useInitialUser } from "@/components/SessionProvider";
-import { todayInTimeZone } from "@/lib/dates";
-import { sortEvents, type EventInput, type EventRecord } from "@/lib/events";
+import { useInitialUser } from "@/components/layout/SessionProvider";
+import { todayInTimeZone } from "@/lib/domain/dates";
+import { sortEvents, type EventInput, type EventRecord } from "@/lib/domain/events";
 import {
   clearLocalEvents,
   localStore,

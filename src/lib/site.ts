@@ -7,8 +7,3 @@ export function siteUrl(): string {
   const withProtocol = raw.startsWith("http") ? raw : `https://${raw}`;
   return withProtocol.replace(/\/$/, "");
 }
-
-export function sharePageUrl(publicId: string, origin?: string): string {
-  const base = (origin ?? siteUrl()).replace(/\/$/, "");
-  return `${base}/p/${publicId}`;
-}

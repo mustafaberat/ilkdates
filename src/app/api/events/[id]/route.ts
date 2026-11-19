@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api";
-import { deleteEvent, updateEvent } from "@/lib/event-repo";
-import { requireUser } from "@/lib/session";
+import { deleteEvent, updateEvent } from "@/lib/db/event-repo";
+import { requireUser } from "@/lib/auth/session";
 
 type Context = { params: Promise<{ id: string }> };
 

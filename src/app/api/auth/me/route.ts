@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { isDatabaseConfigured } from "@/lib/db";
-import { getSessionUser } from "@/lib/session";
+import { getSessionUser } from "@/lib/auth/session";
 
 export async function GET() {
   if (!isDatabaseConfigured()) {

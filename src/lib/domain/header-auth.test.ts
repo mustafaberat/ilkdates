@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { headerAuthState } from "@/lib/header-auth";
-import type { SessionUser } from "@/lib/profile";
+import { headerAuthState } from "@/lib/domain/header-auth";
+import type { SessionUser } from "@/lib/domain/profile";
 
 const member: SessionUser = {
   id: "11111111-1111-4111-8111-111111111111",
