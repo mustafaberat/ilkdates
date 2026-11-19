@@ -53,3 +53,6 @@ tsconfig.tsbuildinfo
 # Design references and implementation screenshots (local only)
 /design/
 /screenshots/
+
+# Local prod test account (never commit)
+.test-user.md
