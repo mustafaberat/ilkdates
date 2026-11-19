@@ -1,17 +1,20 @@
 :root {
-  --bg: #F3EBDD;
-  --ink: #1B2A4A;
-  --ink-soft: #4A5568;
-  --muted: #6B7280;
-  --line: #C9BBA3;
-  --line-strong: #1B2A4A;
-  --paper: #FBF7F0;
-  --wax: #8E1F24;
-  --accent: #8E1F24;
+  --bg: #ece6d6;
+  --ink: #111111;
+  --ink-soft: #555248;
+  --muted: #555248;
+  --line: #c7c0ae;
+  --line-strong: #111111;
+  --paper: #f4efe2;
+  --wax: #c1121f;
+  --accent: #c1121f;
+  --today-bg: #f3ddd8;
+  --banner-link: #ffd3a1;
   --warn-bg: transparent;
-  --serif: var(--font-serif), "Palatino Linotype", Palatino, serif;
-  --mono: var(--font-mono), "Courier New", monospace;
-  --measure: 1120px;
-  --danger: #8E1F24;
+  --serif: var(--font-serif), "Times New Roman", Times, serif;
+  --sans: var(--font-sans), system-ui, sans-serif;
+  --mono: var(--sans);
+  --measure: 1320px;
+  --danger: #c1121f;
   --good: #2f6f55;
 }

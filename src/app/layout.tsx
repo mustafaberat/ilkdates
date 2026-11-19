@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Courier_Prime, EB_Garamond } from "next/font/google";
+import { Archivo, Newsreader } from "next/font/google";
 
 import { SessionProvider } from "@/components/SessionProvider";
 import { tr } from "@/i18n/tr";
@@ -9,18 +9,18 @@ import { siteUrl } from "@/lib/site";
 
 import "./globals.css";
 
-const serif = EB_Garamond({
+const serif = Newsreader({
   subsets: ["latin", "latin-ext"],
   style: ["normal", "italic"],
-  weight: ["500", "600"],
+  weight: "variable",
   variable: "--font-serif",
   display: "swap",
 });
 
-const mono = Courier_Prime({
+const sans = Archivo({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "700"],
-  variable: "--font-mono",
+  weight: "variable",
+  variable: "--font-sans",
   display: "swap",
 });
 
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#F3EBDD",
+  themeColor: "#ece6d6",
 };
 
 export default async function RootLayout({
@@ -68,7 +68,7 @@ export default async function RootLayout({
     initialUser = undefined;
   }
   return (
-    <html lang="tr" className={`${serif.variable} ${mono.variable}`}>
+    <html lang="tr" className={`${serif.variable} ${sans.variable}`}>
       <body>
         <SessionProvider initialUser={initialUser}>{children}</SessionProvider>
       </body>

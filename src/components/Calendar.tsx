@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { monthNames, tr } from "@/i18n/tr";
-import { addMonths, formatPostmark, monthGrid, toISODate, yearList } from "@/lib/dates";
+import { addMonths, monthGrid, toISODate, yearList } from "@/lib/dates";
 
 type Props = {
   year: number;
@@ -66,11 +66,6 @@ export function Calendar({
 
   return (
     <section className="cal" aria-label={`${monthNames[month - 1]} ${year}`}>
-      <div className="postmark">
-        <span>{tr.istanbul}</span>
-        <b>{formatPostmark(today)}</b>
-        <span>{tr.turkey}</span>
-      </div>
       <div className="cal-head" ref={headRef}>
         <h1 className="cal-title" id={titleId}>
           <button

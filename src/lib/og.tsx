@@ -21,10 +21,10 @@ async function loadFonts() {
   ];
 }
 
-const ink = "#1B2A4A";
-const paper = "#FBF7F0";
-const wax = "#8E1F24";
-const line = "#C9BBA3";
+const ink = "#111111";
+const paper = "#ece6d6";
+const wax = "#c1121f";
+const line = "#111111";
 
 function Postmark({ top, bottom, mid }: { top: string; mid: string; bottom: string }) {
   return (
@@ -77,7 +77,7 @@ function Frame({ children }: { children: ReactElement | ReactElement[] }) {
         display: "flex",
         padding: "64px 72px",
         borderBottom: `8px solid ${wax}`,
-        borderTop: `1px solid ${line}`,
+        borderTop: `3px solid ${line}`,
       }}
     >
       {children}
@@ -94,12 +94,12 @@ export async function renderHomeOg() {
           <div
             style={{
               display: "flex",
-              fontFamily: "Courier Prime",
-              fontSize: 22,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: wax,
-              marginBottom: 16,
+              fontFamily: "EB Garamond",
+              fontStyle: "italic",
+              fontSize: 36,
+              letterSpacing: "-0.04em",
+              color: ink,
+              marginBottom: 20,
             }}
           >
             ilkdates

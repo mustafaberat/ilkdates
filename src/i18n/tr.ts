@@ -1,6 +1,8 @@
 export const tr = {
   brand: "ilkdates",
   tagline: "İlk tarihlerinizi kaydedin.",
+  issueLine: "Cilt 01 · Sayı 11",
+  folio: "Sayfa 11",
   metaTitle: "ilkdates — İlk tarihlerinizi kaydedin",
   metaDescription: "İlk tarihleri kaydeden web uygulaması.",
   metaShareDescription: "{date} — bir ilk, bir yıldönümü.",
