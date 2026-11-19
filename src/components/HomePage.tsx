@@ -133,9 +133,11 @@ export function HomePage() {
             empty={tr.emptyAll}
             onSelect={openEdit}
           />
-          <button type="button" className="add" onClick={openCreate}>
-            {tr.addFirst}
-          </button>
+          {listed.length > 0 ? (
+            <button type="button" className="add" onClick={openCreate}>
+              {tr.addEvent}
+            </button>
+          ) : null}
         </section>
       </main>
       <EventForm

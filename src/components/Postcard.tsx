@@ -48,14 +48,14 @@ export function Postcard({ events, today, selected, ready = true, onAdd, onSelec
         ) : events.length === 0 ? (
           <div className="postcard-empty">
             <h2>{tr.addFirstCta}</h2>
-            <button type="button" className="add" onClick={onAdd}>
-              {tr.addEvent}
-            </button>
           </div>
         ) : (
           <Fallback events={events} today={today} onSelectEvent={onSelectEvent} />
         )}
       </div>
+      <button type="button" className="add postcard-add" onClick={onAdd}>
+        {tr.addEvent}
+      </button>
     </aside>
   );
 }

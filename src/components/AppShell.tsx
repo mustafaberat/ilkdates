@@ -18,8 +18,11 @@ type Props = {
 
 export function Wordmark() {
   return (
-    <Link href="/" className="brand">
-      <em>ilk</em>dates
+    <Link href="/" className="brand-lockup">
+      <span className="brand">
+        <em>ilk</em>dates
+      </span>
+      <span className="motto">{tr.tagline}</span>
     </Link>
   );
 }
