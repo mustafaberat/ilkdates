@@ -1,7 +1,5 @@
 export const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-export type Recurrence = "none" | "monthly" | "yearly";
-
 export type Ymd = { y: number; m: number; d: number };
 
 export function parseISODate(iso: string): Ymd {
@@ -43,8 +41,12 @@ export function utcMillis(iso: string): number {
 
 /** Inclusive day count: the start date itself is day 1. */
 export function daysInclusive(fromIso: string, toIso: string): number {
-  const diff = Math.round((utcMillis(toIso) - utcMillis(fromIso)) / 86_400_000);
-  return diff + 1;
+  return daysBetween(fromIso, toIso) + 1;
+}
+
+/** Calendar days between two dates. Same day is 0; a later `to` is positive. */
+export function daysBetween(fromIso: string, toIso: string): number {
+  return Math.round((utcMillis(toIso) - utcMillis(fromIso)) / 86_400_000);
 }
 
 export function isLeapYear(y: number): boolean {
@@ -55,11 +57,6 @@ export function daysInMonth(y: number, m: number): number {
   return new Date(Date.UTC(y, m, 0)).getUTCDate();
 }
 
-/** Day of month for a monthly recurrence, clamped to the last day of that month. */
-export function occurrenceDay(y: number, m: number, originalDay: number): number {
-  return Math.min(originalDay, daysInMonth(y, m));
-}
-
 /** The yearly occurrence in a given year. Feb 29 falls back to Feb 28 in common years. */
 export function yearlyOccurrence(eventIso: string, year: number): string {
   const e = parseISODate(eventIso);
@@ -67,69 +64,98 @@ export function yearlyOccurrence(eventIso: string, year: number): string {
   return toISODate(year, e.m, day);
 }
 
-export function isExactDate(eventIso: string, todayIso: string): boolean {
-  return eventIso === todayIso;
-}
-
 export function isYearlyMatch(eventIso: string, todayIso: string): boolean {
   const today = parseISODate(todayIso);
   return yearlyOccurrence(eventIso, today.y) === todayIso;
-}
-
-export function isMonthlyMatch(eventIso: string, todayIso: string): boolean {
-  const event = parseISODate(eventIso);
-  const today = parseISODate(todayIso);
-  return occurrenceDay(today.y, today.m, event.d) === today.d;
-}
-
-export function monthsBetween(fromIso: string, toIso: string): number {
-  const a = parseISODate(fromIso);
-  const b = parseISODate(toIso);
-  return (b.y - a.y) * 12 + (b.m - a.m);
 }
 
 export function yearsBetween(fromIso: string, toIso: string): number {
   return parseISODate(toIso).y - parseISODate(fromIso).y;
 }
 
-export function isDateOnOrBefore(iso: string, todayIso: string): boolean {
-  return utcMillis(iso) <= utcMillis(todayIso);
-}
-
-export type TodayMatchKind = "start" | "monthly" | "yearly";
-
-export type TodayMatch = {
-  kind: TodayMatchKind;
-  days: number;
-  months?: number;
-  years?: number;
+export type Anniversary = {
+  date: string;
+  years: number;
 };
 
 /**
- * Highlight for an event on `today`.
- * The original date always wins. Yearly recurrence wins over monthly
- * when both would match (same calendar day). Recurrence "none" never
- * highlights a later month or year.
+ * Next yearly anniversary on or after `today`.
+ * If `eventDate` is still in the future, returns that date with years = 0.
+ * If today is the anniversary, returns today with the completed year count.
  */
-export function todayMatch(
-  eventDate: string,
-  recurrence: Recurrence,
-  today: string,
-): TodayMatch | null {
+export function nextAnniversary(eventDate: string, today: string): Anniversary {
+  const start = parseISODate(eventDate);
   if (utcMillis(eventDate) > utcMillis(today)) {
-    return null;
+    return { date: eventDate, years: 0 };
   }
-  const days = daysInclusive(eventDate, today);
-  if (isExactDate(eventDate, today)) {
-    return { kind: "start", days };
+  const todayY = parseISODate(today).y;
+  let year = todayY;
+  let occ = yearlyOccurrence(eventDate, year);
+  if (utcMillis(occ) < utcMillis(today)) {
+    year += 1;
+    occ = yearlyOccurrence(eventDate, year);
   }
-  if (recurrence === "yearly" && isYearlyMatch(eventDate, today)) {
-    return { kind: "yearly", days, years: yearsBetween(eventDate, today) };
+  return { date: occ, years: year - start.y };
+}
+
+export function mostRecentPastDate(dates: string[], today: string): string | null {
+  let latest: string | null = null;
+  for (const iso of dates) {
+    if (utcMillis(iso) > utcMillis(today)) {
+      continue;
+    }
+    if (latest === null || iso > latest) {
+      latest = iso;
+    }
   }
-  if (recurrence === "monthly" && isMonthlyMatch(eventDate, today)) {
-    return { kind: "monthly", days, months: monthsBetween(eventDate, today) };
+  return latest;
+}
+
+export function nearestFutureDate(dates: string[], today: string): string | null {
+  let nearest: string | null = null;
+  for (const iso of dates) {
+    if (utcMillis(iso) <= utcMillis(today)) {
+      continue;
+    }
+    if (nearest === null || iso < nearest) {
+      nearest = iso;
+    }
   }
-  return null;
+  return nearest;
+}
+
+export type UpcomingAnniversary<T extends { date: string }> = {
+  event: T;
+  anniversary: Anniversary;
+  daysUntil: number;
+};
+
+/** Nearest yearly anniversary (years >= 1) on or after today, across all events. */
+export function nextUpcomingAnniversary<T extends { date: string }>(
+  events: T[],
+  today: string,
+): UpcomingAnniversary<T> | null {
+  let best: UpcomingAnniversary<T> | null = null;
+  for (const event of events) {
+    const anniversary = nextAnniversary(event.date, today);
+    if (anniversary.years < 1) {
+      continue;
+    }
+    const daysUntil = daysBetween(today, anniversary.date);
+    if (
+      !best ||
+      daysUntil < best.daysUntil ||
+      (daysUntil === best.daysUntil &&
+        (event.date < best.event.date ||
+          (event.date === best.event.date &&
+            "title" in event &&
+            "title" in best.event &&
+            String(event.title) < String(best.event.title))))
+    ) {
+      best = { event, anniversary, daysUntil };
+    }
+  }
+  return best;
 }
 
 export function todayInTimeZone(
@@ -172,40 +198,15 @@ export function monthGrid(year: number, month: number): (Ymd | null)[] {
   return cells;
 }
 
-export function occursOnDate(
-  eventDate: string,
-  recurrence: Recurrence,
-  target: string,
-): boolean {
-  if (utcMillis(target) < utcMillis(eventDate)) {
-    return false;
-  }
-  if (eventDate === target) {
-    return true;
-  }
-  if (recurrence === "yearly") {
-    return isYearlyMatch(eventDate, target);
-  }
-  if (recurrence === "monthly") {
-    return isMonthlyMatch(eventDate, target);
-  }
-  return false;
-}
-
 export function markerDatesInMonth(
-  events: Array<{ date: string; recurrence: Recurrence }>,
+  events: Array<{ date: string }>,
   year: number,
   month: number,
 ): Set<string> {
-  const marked = new Set<string>();
-  const count = daysInMonth(year, month);
-  for (let day = 1; day <= count; day += 1) {
-    const iso = toISODate(year, month, day);
-    if (events.some((event) => occursOnDate(event.date, event.recurrence, iso))) {
-      marked.add(iso);
-    }
-  }
-  return marked;
+  const prefix = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-`;
+  return new Set(
+    events.filter((event) => event.date.startsWith(prefix)).map((event) => event.date),
+  );
 }
 
 export function formatPostmark(iso: string): string {

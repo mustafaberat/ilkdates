@@ -4,7 +4,6 @@ import { useEffect, useId, useState, type FormEvent } from "react";
 
 import { DatePicker } from "@/components/DatePicker";
 import { formatLongDate, tr } from "@/i18n/tr";
-import type { Recurrence } from "@/lib/dates";
 import { NOTE_MAX_LENGTH, type EventInput, type EventRecord } from "@/lib/events";
 
 const EMOJIS = ["💞", "🤝", "💋", "💬", "🏡", "☕", "🌙", "✈️", "🎁"];
@@ -67,7 +66,6 @@ export function EventForm({
   const [dateOpen, setDateOpen] = useState(false);
   const [emoji, setEmoji] = useState("");
   const [category, setCategory] = useState("");
-  const [recurrence, setRecurrence] = useState<Recurrence>("none");
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -80,7 +78,6 @@ export function EventForm({
     setDateOpen(false);
     setEmoji(event?.emoji ?? "");
     setCategory(event?.category ?? (event ? "" : readLastCategory()));
-    setRecurrence(event?.recurrence ?? "none");
     setNote(event?.note ?? "");
     setError(null);
   }, [open, event, defaultDate]);
@@ -110,12 +107,7 @@ export function EventForm({
   const hintParts = [
     formatLongDate(date),
     date < today ? "geçmiş bir güne not" : date === today ? "bugün" : "gelecek bir gün",
-    recurrence === "yearly"
-      ? "tekrar yıllık"
-      : recurrence === "monthly"
-        ? "tekrar aylık"
-        : "tekrar yok",
-  ].filter(Boolean);
+  ];
 
   async function handleSubmit(ev: FormEvent) {
     ev.preventDefault();
@@ -126,7 +118,6 @@ export function EventForm({
         emoji,
         category,
         note,
-        recurrence,
       });
       if (!event) {
         writeLastCategory(category);
@@ -235,28 +226,6 @@ export function EventForm({
               ))}
             </datalist>
           </label>
-          <div className="field">
-            <span>{tr.recurrence}</span>
-            <div className="seg" role="group" aria-label={tr.recurrence}>
-              {(
-                [
-                  ["none", tr.recurrenceNone],
-                  ["monthly", tr.recurrenceMonthly],
-                  ["yearly", tr.recurrenceYearly],
-                ] as const
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={recurrence === value ? "on" : undefined}
-                  aria-pressed={recurrence === value}
-                  onClick={() => setRecurrence(value)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
           <label className="field">
             <span>{tr.note}</span>
             <textarea

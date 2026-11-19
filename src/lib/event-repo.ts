@@ -15,7 +15,6 @@ function toRecord(row: EventRow): EventRecord {
     date: row.date,
     emoji: row.emoji,
     category: row.category,
-    recurrence: row.recurrence,
     note: row.note,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -44,7 +43,6 @@ export async function createEvent(
     date: input.date,
     emoji: input.emoji,
     category: input.category,
-    recurrence: input.recurrence,
     note: input.note,
     ...(input.id ? { id: input.id } : {}),
   };
@@ -69,8 +67,7 @@ export async function updateEvent(
       date: input.date,
       emoji: input.emoji,
       category: input.category,
-      recurrence: input.recurrence,
-      note: input.note,
+        note: input.note,
       updatedAt: new Date(),
     })
     .where(and(eq(events.id, id), eq(events.userId, userId)))

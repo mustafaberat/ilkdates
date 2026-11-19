@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import { formatShortDate, tr } from "@/i18n/tr";
-import { todayMatch } from "@/lib/dates";
 import type { EventRecord } from "@/lib/events";
-import { eventAgeLabel, recurrenceLabel } from "@/lib/labels";
+import { eventAgeLabel } from "@/lib/labels";
 
 type Props = {
   events: EventRecord[];
@@ -24,17 +23,13 @@ export function EventList({ events, today, empty, onSelect }: Props) {
       <div className="ledger-head" role="row">
         <span role="columnheader">{tr.colDate}</span>
         <span role="columnheader">{tr.colFirst}</span>
-        <span role="columnheader" className="ledger-rec">
-          {tr.colRecurrence}
-        </span>
         <span role="columnheader" className="ledger-age">
           {tr.colAge}
         </span>
       </div>
       {events.map((event) => {
-        const isToday = Boolean(todayMatch(event.date, event.recurrence, today));
-        const age = eventAgeLabel(event.date, event.recurrence, today);
-        const rec = event.recurrence !== "none" ? recurrenceLabel(event.recurrence) : "";
+        const isToday = event.date === today;
+        const age = eventAgeLabel(event.date, today);
         return (
           <button
             key={event.id}
@@ -56,9 +51,6 @@ export function EventList({ events, today, empty, onSelect }: Props) {
                 <span className="ttl">{event.title}</span>
               </span>
               {event.note ? <EventNote text={event.note} /> : null}
-            </span>
-            <span className="ledger-rec" role="cell">
-              {rec}
             </span>
             <span className="meta" role="cell">
               {age}

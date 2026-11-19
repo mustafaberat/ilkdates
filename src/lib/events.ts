@@ -4,7 +4,6 @@ import {
   DATE_RE,
   isValidYmd,
   parseISODate,
-  type Recurrence,
 } from "@/lib/dates";
 
 export const NOTE_MAX_LENGTH = 1000;
@@ -15,13 +14,10 @@ export type EventRecord = {
   date: string;
   emoji: string | null;
   category: string | null;
-  recurrence: Recurrence;
   note: string | null;
   createdAt: string;
   updatedAt: string;
 };
-
-const recurrenceSchema = z.enum(["none", "monthly", "yearly"]);
 
 const isoDateSchema = z
   .string()
@@ -50,7 +46,6 @@ export const eventInputSchema = z.object({
     .transform((value) => (value ?? "").replace(/\s+/g, " ").trim())
     .pipe(z.string().max(40, "invalid_category"))
     .transform((value) => (value ? value : null)),
-  recurrence: recurrenceSchema.default("none"),
   note: z
     .union([z.string(), z.null(), z.undefined()])
     .transform((value) => (value ?? "").trim())
@@ -83,4 +78,4 @@ export function datesInMonth(
   return new Set(events.filter((event) => event.date.startsWith(prefix)).map((event) => event.date));
 }
 
-export { parseISODate, recurrenceSchema };
+export { parseISODate };

@@ -1,24 +1,24 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  daysBetween,
   daysInclusive,
   daysInMonth,
   isLeapYear,
-  isMonthlyMatch,
   isYearlyMatch,
   markerDatesInMonth,
   monthGrid,
-  monthsBetween,
-  occurrenceDay,
-  occursOnDate,
+  mostRecentPastDate,
+  nearestFutureDate,
+  nextAnniversary,
+  nextUpcomingAnniversary,
   calendarYearBounds,
   earliestEventDate,
   todayInTimeZone,
-  todayMatch,
   yearlyOccurrence,
   yearList,
-  yearsBetween,
 } from "@/lib/dates";
+import { anniversaryCaption, elapsedCaption } from "@/lib/labels";
 import { eventInputSchema } from "@/lib/events";
 
 describe("daysInclusive", () => {
@@ -34,7 +34,7 @@ describe("daysInclusive", () => {
   });
 });
 
-describe("leap years and yearly recurrence", () => {
+describe("leap years and yearly occurrence", () => {
   it("detects leap years", () => {
     expect(isLeapYear(2024)).toBe(true);
     expect(isLeapYear(2025)).toBe(false);
@@ -60,61 +60,80 @@ describe("leap years and yearly recurrence", () => {
   });
 });
 
-describe("monthly recurrence", () => {
-  it("matches the same day of month", () => {
-    expect(isMonthlyMatch("2024-01-15", "2024-02-15")).toBe(true);
-    expect(isMonthlyMatch("2024-01-15", "2024-02-14")).toBe(false);
+describe("elapsed days and yearly anniversaries", () => {
+  it("counts calendar days between two dates, 0 on the same day", () => {
+    expect(daysBetween("2026-11-19", "2026-11-19")).toBe(0);
+    expect(daysBetween("2026-11-19", "2026-11-29")).toBe(10);
+    expect(daysBetween("2026-11-29", "2026-11-19")).toBe(-10);
   });
 
-  it("clamps the 31st to the last day of shorter months", () => {
-    expect(occurrenceDay(2024, 2, 31)).toBe(29);
-    expect(occurrenceDay(2025, 2, 31)).toBe(28);
-    expect(occurrenceDay(2024, 4, 31)).toBe(30);
-    expect(isMonthlyMatch("2024-01-31", "2024-02-29")).toBe(true);
-    expect(isMonthlyMatch("2024-01-31", "2024-04-30")).toBe(true);
-    expect(isMonthlyMatch("2024-01-31", "2024-04-29")).toBe(false);
-    expect(isMonthlyMatch("2024-01-31", "2024-03-31")).toBe(true);
+  it("computes the next 1st anniversary 10 days out (Mustafa example)", () => {
+    const today = "2026-11-19";
+    const anniversary = nextAnniversary("2025-11-29", today);
+    expect(anniversary).toEqual({ date: "2026-11-29", years: 1 });
+    expect(daysBetween(today, anniversary.date)).toBe(10);
+    expect(anniversaryCaption("Kaydırak", anniversary, today)).toBe(
+      "Tam 10 gün sonra «Kaydırak» 1. yılı",
+    );
   });
-});
 
-describe("todayMatch highlights", () => {
-  it("highlights the original date as start, even with yearly recurrence", () => {
-    expect(todayMatch("2026-11-18", "yearly", "2026-11-18")).toEqual({
-      kind: "start",
-      days: 1,
+  it("returns today when it is the anniversary", () => {
+    const today = "2026-11-19";
+    const anniversary = nextAnniversary("2025-11-19", today);
+    expect(anniversary).toEqual({ date: "2026-11-19", years: 1 });
+    expect(anniversaryCaption("Kahve", anniversary, today)).toBe(
+      "Bugün «Kahve» 1. yılı",
+    );
+  });
+
+  it("rolls to next year when this year's occurrence has already passed", () => {
+    expect(nextAnniversary("2025-01-01", "2026-11-19")).toEqual({
+      date: "2027-01-01",
+      years: 2,
     });
   });
 
-  it("highlights a yearly anniversary and reports elapsed years", () => {
-    expect(todayMatch("2023-11-18", "yearly", "2026-11-18")).toEqual({
-      kind: "yearly",
-      days: daysInclusive("2023-11-18", "2026-11-18"),
+  it("uses the Feb 28 fallback for a Feb 29 start in a common year", () => {
+    expect(nextAnniversary("2024-02-29", "2026-11-19")).toEqual({
+      date: "2027-02-28",
       years: 3,
     });
-    expect(yearsBetween("2023-11-18", "2026-11-18")).toBe(3);
   });
 
-  it("highlights a monthly anniversary and reports elapsed months", () => {
-    expect(todayMatch("2024-01-18", "monthly", "2024-11-18")).toEqual({
-      kind: "monthly",
-      days: daysInclusive("2024-01-18", "2024-11-18"),
-      months: 10,
+  it("returns the original date with years 0 when the event is still in the future", () => {
+    expect(nextAnniversary("2026-12-01", "2026-11-19")).toEqual({
+      date: "2026-12-01",
+      years: 0,
     });
-    expect(monthsBetween("2024-01-18", "2024-11-18")).toBe(10);
   });
 
-  it("prefers yearly over monthly when both would match", () => {
-    const match = todayMatch("2023-11-18", "yearly", "2026-11-18");
-    expect(match?.kind).toBe("yearly");
+  it("describes elapsed time from a past first", () => {
+    expect(elapsedCaption("2026-11-18", "2026-11-19")).toBe("Tam 1 gün geçti");
+    expect(elapsedCaption("2026-11-19", "2026-11-19")).toBe("Bugün");
+    expect(elapsedCaption("2026-11-29", "2026-11-19")).toBe("Tam 10 gün sonra");
   });
 
-  it("does not highlight later years or months when recurrence is none", () => {
-    expect(todayMatch("2023-11-18", "none", "2026-11-18")).toBeNull();
-    expect(todayMatch("2023-11-18", "none", "2023-12-18")).toBeNull();
+  it("picks the most recent past date and the nearest future date", () => {
+    const dates = ["2025-11-01", "2026-11-18", "2026-12-01"];
+    expect(mostRecentPastDate(dates, "2026-11-19")).toBe("2026-11-18");
+    expect(nearestFutureDate(dates, "2026-11-19")).toBe("2026-12-01");
+    expect(mostRecentPastDate(["2026-12-01"], "2026-11-19")).toBeNull();
   });
 
-  it("returns null for events that start after today", () => {
-    expect(todayMatch("2026-11-19", "yearly", "2026-11-18")).toBeNull();
+  it("picks the nearest upcoming anniversary across events", () => {
+    const events = [
+      { date: "2025-11-29", title: "Kaydırak" },
+      { date: "2024-01-01", title: "Yılbaşı" },
+    ];
+    const upcoming = nextUpcomingAnniversary(events, "2026-11-19");
+    expect(upcoming?.event.title).toBe("Kaydırak");
+    expect(upcoming?.anniversary).toEqual({ date: "2026-11-29", years: 1 });
+    expect(upcoming?.daysUntil).toBe(10);
+  });
+
+  it("skips a still-future first when looking for an anniversary", () => {
+    const events = [{ date: "2026-12-01", title: "Konser" }];
+    expect(nextUpcomingAnniversary(events, "2026-11-19")).toBeNull();
   });
 });
 
@@ -151,6 +170,7 @@ describe("event validation", () => {
       recurrence: "yearly",
     });
     expect(parsed.title).toBe("İlk el tutma");
+    expect("recurrence" in parsed).toBe(false);
     expect(() =>
       eventInputSchema.parse({ title: "   ", date: "2026-11-18" }),
     ).toThrow();
@@ -175,6 +195,7 @@ describe("event validation", () => {
     expect(parsed.emoji).toBeNull();
     expect(parsed.category).toBeNull();
     expect(parsed.note).toBeNull();
+    expect("recurrence" in parsed).toBe(false);
   });
 });
 
@@ -191,26 +212,11 @@ describe("daysInclusive relationship counter", () => {
   });
 });
 
-describe("recurrence calendar markers", () => {
-  it("marks a yearly first in later years, not only the original date", () => {
-    const events = [{ date: "2025-11-18", recurrence: "yearly" as const }];
-    const marks = markerDatesInMonth(events, 2026, 11);
-    expect(marks.has("2026-11-18")).toBe(true);
-    expect(marks.has("2025-11-18")).toBe(false);
-  });
-
-  it("marks a monthly first in later months, clamped to the month length", () => {
-    const events = [{ date: "2025-01-31", recurrence: "monthly" as const }];
-    const february = markerDatesInMonth(events, 2025, 2);
-    expect(february.has("2025-02-28")).toBe(true);
-    expect(february.has("2025-02-31")).toBe(false);
-  });
-
-  it("does not mark later months when recurrence is none", () => {
-    const events = [{ date: "2025-11-18", recurrence: "none" as const }];
-    expect(occursOnDate("2025-11-18", "none", "2026-11-18")).toBe(false);
-    expect(markerDatesInMonth(events, 2026, 11).has("2026-11-18")).toBe(false);
+describe("calendar markers", () => {
+  it("marks only the original date in the matching month", () => {
+    const events = [{ date: "2025-11-18" }];
     expect(markerDatesInMonth(events, 2025, 11).has("2025-11-18")).toBe(true);
+    expect(markerDatesInMonth(events, 2026, 11).has("2026-11-18")).toBe(false);
   });
 });
 
@@ -250,7 +256,6 @@ describe("future event dates", () => {
     const parsed = eventInputSchema.parse({
       title: "İlk konser",
       date: "2027-06-01",
-      recurrence: "none",
     });
     expect(parsed.date).toBe("2027-06-01");
   });

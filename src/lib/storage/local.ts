@@ -12,6 +12,15 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function stripRecurrence<T extends object>(value: T): T {
+  if (value && "recurrence" in value) {
+    const { recurrence: _ignored, ...rest } = value as T & { recurrence?: unknown };
+    void _ignored;
+    return rest as T;
+  }
+  return value;
+}
+
 function readAll(): EventRecord[] {
   if (typeof window === "undefined") {
     return [];
@@ -21,15 +30,44 @@ function readAll(): EventRecord[] {
     if (!raw) {
       return [];
     }
-    const parsed = JSON.parse(raw) as EventRecord[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    const records: EventRecord[] = [];
+    for (const item of parsed) {
+      try {
+        const input = parseEventInput(item);
+        const row = (item ?? {}) as Partial<EventRecord>;
+        records.push(
+          stripRecurrence({
+            id:
+              input.id ??
+              (typeof row.id === "string" && row.id ? row.id : crypto.randomUUID()),
+            title: input.title,
+            date: input.date,
+            emoji: input.emoji,
+            category: input.category,
+            note: input.note,
+            createdAt: typeof row.createdAt === "string" ? row.createdAt : nowIso(),
+            updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : nowIso(),
+          }),
+        );
+      } catch {
+        // skip malformed leftover records
+      }
+    }
+    return records;
   } catch {
     return [];
   }
 }
 
 function writeAll(events: EventRecord[]): void {
-  window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(events));
+  window.localStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(events.map(stripRecurrence)),
+  );
 }
 
 export function peekLocalEvents(): EventRecord[] {
@@ -67,14 +105,13 @@ export const localStore: EventStore = {
       date: parsed.date,
       emoji: parsed.emoji,
       category: parsed.category,
-      recurrence: parsed.recurrence,
       note: parsed.note,
       createdAt: now,
       updatedAt: now,
     };
     const events = readAll();
     events.push(record);
-    writeAll(events);
+    writeAll(events.map(stripRecurrence));
     return record;
   },
   async update(id, input) {
@@ -91,7 +128,6 @@ export const localStore: EventStore = {
       date: parsed.date,
       emoji: parsed.emoji,
       category: parsed.category,
-      recurrence: parsed.recurrence,
       note: parsed.note,
       updatedAt: nowIso(),
     };

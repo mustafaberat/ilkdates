@@ -200,7 +200,6 @@ export function DatePicker({ value, today, open, onOpenChange, onChange }: Props
                   const iso = toISODate(cell.y, cell.m, cell.d);
                   const isSelected = iso === value;
                   const isToday = iso === today;
-                  const isFuture = iso > today;
                   return (
                     <button
                       key={iso}
@@ -209,19 +208,32 @@ export function DatePicker({ value, today, open, onOpenChange, onChange }: Props
                         "day",
                         isToday ? "is-today" : "",
                         isSelected ? "is-selected" : "",
-                        isFuture ? "is-future" : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}
-                      
+                      aria-current={isToday ? "date" : undefined}
                       aria-pressed={isSelected}
                       onClick={() => pickDay(cell.y, cell.m, cell.d)}
                     >
-                      {cell.d}
+                      <span className="n">{cell.d}</span>
+                      {isToday ? <span className="dot" aria-hidden="true" /> : null}
                     </button>
                   );
                 })}
               </div>
+              <button
+                type="button"
+                className="date-picker-today"
+                onClick={() => {
+                  const { y, m } = parseISODate(today);
+                  setCursorYear(y);
+                  setCursorMonth(m);
+                  setView("days");
+                  onChange(today);
+                }}
+              >
+                {tr.todayLabel}
+              </button>
             </>
           ) : null}
         </div>

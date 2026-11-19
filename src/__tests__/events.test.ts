@@ -5,7 +5,6 @@ import { NOTE_MAX_LENGTH, eventInputSchema, parseEventInput } from "@/lib/events
 const base = {
   title: "Kaydırak",
   date: "2025-02-14",
-  recurrence: "none" as const,
 };
 
 describe("note length", () => {

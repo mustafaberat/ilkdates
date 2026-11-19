@@ -1,50 +1,49 @@
 import { t, tr } from "@/i18n/tr";
 import {
+  daysBetween,
   daysInclusive,
-  todayMatch,
-  utcMillis,
-  type Recurrence,
+  nextAnniversary,
+  type Anniversary,
 } from "@/lib/dates";
 
-export function eventAgeLabel(date: string, recurrence: Recurrence, today: string): string {
-  if (utcMillis(date) > utcMillis(today)) {
-    return "";
+export function eventAgeLabel(date: string, today: string): string {
+  const delta = daysBetween(date, today);
+  if (delta > 0) {
+    return t(tr.daysCount, { n: daysInclusive(date, today) });
   }
-  const match = todayMatch(date, recurrence, today);
-  if (match?.kind === "yearly" && match.years) {
-    return t(tr.yearsCount, { n: match.years });
+  if (delta < 0) {
+    return t(tr.daysUntilShort, { n: -delta });
   }
-  if (match?.kind === "monthly" && match.months) {
-    return t(tr.monthsCount, { n: match.months });
-  }
-  return t(tr.daysCount, { n: daysInclusive(date, today) });
+  return tr.todayLabel;
 }
 
-export function todayStampCaption(
+export function elapsedCaption(date: string, today: string): string {
+  const n = daysBetween(date, today);
+  if (n === 0) {
+    return tr.todayLabel;
+  }
+  if (n > 0) {
+    return t(tr.daysAgo, { n });
+  }
+  return t(tr.daysUntil, { n: -n });
+}
+
+export function anniversaryCaption(
   title: string,
-  date: string,
-  recurrence: Recurrence,
+  anniversary: Anniversary,
   today: string,
-): string | null {
-  const match = todayMatch(date, recurrence, today);
-  if (!match) {
+): string {
+  const daysUntil = daysBetween(today, anniversary.date);
+  if (daysUntil === 0) {
+    return t(tr.anniversaryToday, { title, n: anniversary.years });
+  }
+  return t(tr.anniversarySoon, { title, n: daysUntil, k: anniversary.years });
+}
+
+export function nextAnniversaryCaption(title: string, date: string, today: string): string | null {
+  const anniversary = nextAnniversary(date, today);
+  if (anniversary.years < 1) {
     return null;
   }
-  if (match.kind === "yearly") {
-    return t(tr.todayYearly, { title, n: match.years ?? 0 });
-  }
-  if (match.kind === "monthly") {
-    return t(tr.todayMonthly, { title, n: match.months ?? 0 });
-  }
-  return t(tr.todayStart, { title });
-}
-
-export function recurrenceLabel(recurrence: Recurrence): string {
-  if (recurrence === "yearly") {
-    return tr.recurrenceYearly;
-  }
-  if (recurrence === "monthly") {
-    return tr.recurrenceMonthly;
-  }
-  return tr.recurrenceNone;
+  return anniversaryCaption(title, anniversary, today);
 }

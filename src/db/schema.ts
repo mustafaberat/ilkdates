@@ -2,15 +2,12 @@ import {
   boolean,
   date,
   index,
-  pgEnum,
   pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-
-export const recurrenceEnum = pgEnum("recurrence", ["none", "monthly", "yearly"]);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -55,7 +52,6 @@ export const events = pgTable(
     date: date("date", { mode: "string" }).notNull(),
     emoji: varchar("emoji", { length: 16 }),
     category: varchar("category", { length: 40 }),
-    recurrence: recurrenceEnum("recurrence").notNull().default("none"),
     note: varchar("note", { length: 1000 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

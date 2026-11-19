@@ -6,16 +6,15 @@ import { AppShell } from "@/components/AppShell";
 import { Calendar } from "@/components/Calendar";
 import { EventForm } from "@/components/EventForm";
 import { EventList } from "@/components/EventList";
+import { Postcard } from "@/components/Postcard";
 import { useSessionEvents } from "@/hooks/useSessionEvents";
-import { formatWeekdayLong, t, tr } from "@/i18n/tr";
+import { t, tr } from "@/i18n/tr";
 import {
   calendarYearBounds,
   markerDatesInMonth,
   parseISODate,
-  todayMatch,
 } from "@/lib/dates";
 import type { EventInput, EventRecord } from "@/lib/events";
-import { recurrenceLabel, todayStampCaption } from "@/lib/labels";
 
 export function HomePage() {
   const session = useSessionEvents();
@@ -48,22 +47,6 @@ export function HomePage() {
     }
     return list.sort((a, b) => a.localeCompare(b, "tr"));
   }, [session.events]);
-
-  const stamps = useMemo(() => {
-    return session.events
-      .map((event) => {
-        const match = todayMatch(event.date, event.recurrence, session.today);
-        const caption = todayStampCaption(
-          event.title,
-          event.date,
-          event.recurrence,
-          session.today,
-        );
-        return match && caption ? { event, match, caption } : null;
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null)
-      .sort((a, b) => rank(a.match.kind) - rank(b.match.kind));
-  }, [session.events, session.today]);
 
   const listed = useMemo(() => {
     return [...session.events].sort((a, b) => {
@@ -133,27 +116,13 @@ export function HomePage() {
               setMonth(parsed.m);
             }}
           />
-          <aside className="side">
-            <div className="when">{formatWeekdayLong(session.today)}</div>
-            {stamps.length > 0 ? (
-              <div className="today-box">
-                <div className="kicker">{tr.todayStamp}</div>
-                {stamps.map(({ event, match, caption }) => (
-                  <div key={event.id}>
-                    <h2>
-                      {event.emoji ? `${event.emoji} ` : ""}
-                      {event.title}
-                    </h2>
-                    <p>{caption}</p>
-                    <div className="row">
-                      <span className="kicker">{recurrenceLabel(event.recurrence)}</span>
-                    </div>
-                    {match.kind === "start" ? null : null}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </aside>
+          <Postcard
+            events={session.events}
+            today={session.today}
+            selected={selected}
+            onAdd={openCreate}
+            onSelectEvent={openEdit}
+          />
         </div>
         <section className="ledger" aria-label={tr.allFirsts}>
           <h2>{tr.allFirsts}</h2>
@@ -192,13 +161,4 @@ export function HomePage() {
   );
 }
 
-function rank(kind: "start" | "yearly" | "monthly"): number {
-  if (kind === "yearly") {
-    return 0;
-  }
-  if (kind === "monthly") {
-    return 1;
-  }
-  return 2;
-}
 

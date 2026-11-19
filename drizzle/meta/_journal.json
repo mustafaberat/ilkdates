@@ -36,6 +36,13 @@
       "when": 1731950030000,
       "tag": "0004_note_varchar_1000",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1731950040000,
+      "tag": "0005_drop_recurrence",
+      "breakpoints": true
     }
   ]
 }
